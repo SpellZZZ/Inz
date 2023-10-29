@@ -6,8 +6,8 @@ public class AuthenticationRequestDto implements Serializable {
 
     private static final long serialVersionUID = 5926468583005150707L;
 
-    private String username;
-    private String password;
+    private String loginUsername;
+    private String loginPassword;
 
     //need default constructor for JSON Parsing
     public AuthenticationRequestDto() {
@@ -15,24 +15,24 @@ public class AuthenticationRequestDto implements Serializable {
     }
 
     public AuthenticationRequestDto(String username, String password) {
-        this.setUsername(username);
-        this.setPassword(password);
+        this.setLoginUsername(username);
+        this.setLoginPassword(password);
     }
 
-    public String getUsername() {
-        return this.username;
+    public String getLoginUsername() {
+        return this.loginUsername;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setLoginUsername(String loginUsername) {
+        this.loginUsername = loginUsername;
     }
 
-    public String getPassword() {
-        return this.password;
+    public String getLoginPassword() {
+        return this.loginPassword;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setLoginPassword(String loginPassword) {
+        this.loginPassword = loginPassword;
     }
 
 }

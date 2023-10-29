@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,10 +54,11 @@ public class SecurityConfiguration {
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(new MvcRequestMatcher(handlerMappingIntrospector,"/authenticate/**")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(handlerMappingIntrospector,"/userRegister/**")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(handlerMappingIntrospector,"/userRegister")).permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(excp -> excp.authenticationEntryPoint(jwtAuthenticationEntryPoint))

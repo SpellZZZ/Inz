@@ -1,8 +1,5 @@
 package org.example.dao;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
 import org.example.model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -51,5 +48,10 @@ public class UserDAOImpl implements  UserDAO{
         query.setParameter("username", username);
         List<User> users = query.getResultList();
         return users.isEmpty() ? null : users.get(0);
+    }
+    @Override
+    public void updateUser(User user) {
+        Session currentSession = sessionFactory.getCurrentSession();
+        currentSession.update(user);
     }
 }

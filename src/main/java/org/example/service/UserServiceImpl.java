@@ -1,7 +1,6 @@
 package org.example.service;
 
 
-import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import jakarta.transaction.Transactional;
 import org.example.dao.UserDAO;
 import org.example.model.User;
@@ -35,7 +34,13 @@ public class UserServiceImpl implements UserService {
         userDAO.deleteUser(id);
     }
     @Override
+    @Transactional
     public User getUserByUserName(String username) {
         return userDAO.getUserByUserName(username);
+    }
+    @Override
+    @Transactional
+    public void userUpdate(User user) {
+        userDAO.updateUser(user);
     }
 }
