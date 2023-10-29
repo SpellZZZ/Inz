@@ -50,6 +50,16 @@ public class UserDAOImpl implements  UserDAO{
         return users.isEmpty() ? null : users.get(0);
     }
     @Override
+    public User getUserByEmail(String email) {
+        Session currentSession = sessionFactory.getCurrentSession();
+        String hql = "FROM User u WHERE u.email = :email";
+        Query<User> query = currentSession.createQuery(hql, User.class);
+        query.setParameter("email", email);
+        List<User> users = query.getResultList();
+        return users.isEmpty() ? null : users.get(0);
+    }
+
+    @Override
     public void updateUser(User user) {
         Session currentSession = sessionFactory.getCurrentSession();
         currentSession.update(user);

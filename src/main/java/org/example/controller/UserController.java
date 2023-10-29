@@ -2,6 +2,9 @@ package org.example.controller;
 
 import org.example.dto.RegisterFormDto;
 import org.example.dto.UserUpdateDto;
+import org.example.exceptions.DatabaseSaveException;
+import org.example.exceptions.JwtTokenException;
+import org.example.exceptions.UserAlreadyExistsException;
 import org.example.model.User;
 import org.example.service.UserService;
 import org.example.util.JwtTokenUtil;
@@ -17,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController("/user")
-public class UserController {
+public class UserController{
 
     @Autowired
     private UserService userService;
@@ -34,60 +37,102 @@ public class UserController {
     List<User> getUsers(){
         return userService.getUsers();
     }
-    @GetMapping("/userByLogin")
-    List<User> getUsersByLogin(){
-        List<User> u = new ArrayList<>();
-        u.add(userService.getUserByUserName("foolishuser"));
-        return u;
-    }
-    //duzo do edycji
-    //dodanie wyjatku
+
+    //TODO duzo do edycji - kiedy beda dodawne nowe pola do bazy danych trzeba to tu uwzglednic
     @PostMapping("/userRegister")
-    public ResponseEntity<Object> userRegister(@RequestBody RegisterFormDto registerFormDto){
-
-        String hashedPassword = passwordEncoder.encode(registerFormDto.getRegisterPassword());
-
-        User user = new User();
-        user.setUsername(registerFormDto.getRegisterUsername());
-        user.setPassword(hashedPassword);
-        user.setEmail(registerFormDto.getRegisterEmail());
-        user.setRole(null);
-        user.setDeleted("no");
-        user.setCompany(null);
-        user.setPassword_recovery_link("123");
-
-        userService.saveUser(user);
+    public ResponseEntity<Object> userRegister(@RequestBody RegisterFormDto registerFormDto) {
 
         Map<String, Object> response = new HashMap<>();
-        response.put("validate", true);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+
+        try {
+
+            String hashedPassword = passwordEncoder.encode(registerFormDto.getRegisterPassword());
+
+            if( userService.getUserByUserName(registerFormDto.getRegisterUsername()) != null ||
+                    userService.getUserByEmail(registerFormDto.getRegisterEmail()) != null
+            ) throw new UserAlreadyExistsException("Uzytkownik o takim loginie lub emailu istneije");
+
+            User user = new User();
+            user.setUsername(registerFormDto.getRegisterUsername());
+            user.setPassword(hashedPassword);
+            user.setEmail(registerFormDto.getRegisterEmail());
+            user.setRole(null);
+            user.setDeleted(false);
+            user.setCompany(null);
+            user.setPassword_recovery_link("123");
+
+            userService.saveUser(user);
+
+            response.put("validate", true);
+            response.put("message", "Udalo sie dodac uzytkownika do bazy danych");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (UserAlreadyExistsException e) {
+            response.put("validate", false);
+            response.put("message", e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.CONFLICT); // 409 Konflikt
+        } /*catch (DatabaseSaveException e) {
+            response.put("validate", false);
+            response.put("message", "Wystąpił błąd z baza danych");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR); // 500
+        } */catch (Exception e) {
+            response.put("validate", false);
+            response.put("message", "Wystąpił błąd podczas rejestracji użytkownika");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR); // 500
+        }
+
+
     }
 
 
-    //dodac jeszcze cos tu
+    //TODO dodac jeszcze cos tu - chodzi o pola user
     @PostMapping("/userUpdate")
-    public ResponseEntity<String> userUpdate(@RequestBody UserUpdateDto userUpdateDto,
+    public ResponseEntity<Object> userUpdate(@RequestBody UserUpdateDto userUpdateDto,
                                              @RequestHeader("Authorization") String authorizationHeader) {
-        String token;
 
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Brak autoryzacji");
+
+        Map<String, Object> response = new HashMap<>();
+
+
+        try {
+            final String token = JwtAuthenticationController.authenticateToken(authorizationHeader);
+            if(token == null) {
+                throw new JwtTokenException("Wystapil blad z tokenem");
+
+            }
+
+
+            String userName = jwtTokenUtil.getUsernameFromToken(token);
+            User user = userService.getUserByUserName(userName);
+
+            if(userUpdateDto.getEmail() != null) {
+                user.setEmail( userUpdateDto.getEmail() );
+            }
+            if(userUpdateDto.getPassword() != null) {
+                String hashedPassword = passwordEncoder.encode(userUpdateDto.getPassword());
+                user.setPassword(hashedPassword);
+            }
+
+            userService.userUpdate(user);
+
+            response.put("validate", true);
+            response.put("message", "Zaktualizowano dane użytkownika");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (JwtTokenException ex) {
+            response.put("validate", false);
+            response.put("message", ex.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED); //401
+        }
+        catch (Exception ex) {
+            response.put("validate", false);
+            response.put("message", "Wystapil blad");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR); // 500
         }
 
-        String userName = jwtTokenUtil.getUsernameFromToken(token);
-        User user = userService.getUserByUserName(userName);
 
-        user.setEmail( userUpdateDto.getEmail() );
-        String hashedPassword = passwordEncoder.encode(userUpdateDto.getPassword());
-        user.setPassword(hashedPassword);
-
-        userService.userUpdate(user);
-
-
-        return ResponseEntity.ok("Zaktualizowano dane użytkownika");
 
     }
 

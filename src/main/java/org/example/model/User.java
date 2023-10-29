@@ -29,8 +29,8 @@ public class User {
     @Column(length = 30)
     @Email
     String email;
-    @Column(length = 10)
-    String deleted;
+
+    Boolean deleted;
     @Column(length = 10)
     String password_recovery_link;
 

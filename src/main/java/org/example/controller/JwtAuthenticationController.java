@@ -29,10 +29,6 @@ public class JwtAuthenticationController {
     @PostMapping(value = "/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequestDto authenticationRequest) throws Exception {
 
-        System.out.println(authenticationRequest.getLoginUsername());
-        System.out.println(authenticationRequest.getLoginPassword());
-        System.out.println();
-        System.out.println();
 
         authenticate(authenticationRequest.getLoginUsername(), authenticationRequest.getLoginPassword());
 
@@ -49,6 +45,15 @@ public class JwtAuthenticationController {
         } catch (BadCredentialsException e) {
             throw new Exception("INVALID_CREDENTIALS", e);
         }
+    }
+
+
+
+    public static String authenticateToken(String authorizationHeader){
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ") ) return authorizationHeader.substring(7);
+
+        return null;
     }
 
 }
