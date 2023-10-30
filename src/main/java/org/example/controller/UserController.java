@@ -1,5 +1,7 @@
 package org.example.controller;
 
+import org.example.dto.AuthenticateResponseDto;
+import org.example.dto.AuthenticationRequestDto;
 import org.example.dto.RegisterFormDto;
 import org.example.dto.UserUpdateDto;
 import org.example.exceptions.DatabaseSaveException;
@@ -11,6 +13,10 @@ import org.example.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +37,8 @@ public class UserController{
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
 
     @GetMapping("/allUsers")
@@ -38,15 +46,39 @@ public class UserController{
         return userService.getUsers();
     }
 
+
+    @PostMapping(value = "/authenticate")
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequestDto authenticationRequest) throws Exception {
+        authenticate(authenticationRequest.getLoginUsername(), authenticationRequest.getLoginPassword());
+        final String token = jwtTokenUtil.generateToken(authenticationRequest.getLoginUsername());
+        return ResponseEntity.ok(new AuthenticateResponseDto(token));
+    }
+
+    private void authenticate(String username, String password) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        } catch (DisabledException e) {
+            throw new Exception("USER_DISABLED", e);
+        } catch (BadCredentialsException e) {
+            throw new Exception("INVALID_CREDENTIALS", e);
+        }
+    }
+
+    public String authenticateToken(String authorizationHeader){
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ") ) return authorizationHeader.substring(7);
+        return null;
+    }
+
+
+
     //TODO duzo do edycji - kiedy beda dodawne nowe pola do bazy danych trzeba to tu uwzglednic
     @PostMapping("/userRegister")
     public ResponseEntity<Object> userRegister(@RequestBody RegisterFormDto registerFormDto) {
 
         Map<String, Object> response = new HashMap<>();
 
-
         try {
-
             String hashedPassword = passwordEncoder.encode(registerFormDto.getRegisterPassword());
 
             if( userService.getUserByUserName(registerFormDto.getRegisterUsername()) != null ||
@@ -97,7 +129,7 @@ public class UserController{
 
 
         try {
-            final String token = JwtAuthenticationController.authenticateToken(authorizationHeader);
+            final String token = authenticateToken(authorizationHeader);
             if(token == null) {
                 throw new JwtTokenException("Wystapil blad z tokenem");
 
