@@ -1,7 +1,7 @@
 package org.example.authConf;
 
 
-import org.example.service.JwtUserDetailsService;
+import org.example.service.managementService.UserJwtDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,7 +33,7 @@ public class SecurityConfiguration {
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
+    private UserJwtDetailsService userJwtDetailsService;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
@@ -48,7 +48,7 @@ public class SecurityConfiguration {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 httpSecurity.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder
-                .userDetailsService(jwtUserDetailsService)
+                .userDetailsService(userJwtDetailsService)
                 .passwordEncoder(passwordEncoder);
 
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

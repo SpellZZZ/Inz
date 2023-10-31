@@ -1,8 +1,7 @@
-package org.example.service;
+package org.example.service.managementService;
 
-import org.example.dto.AuthenticationRequestDto;
+import org.example.service.dbService.UserDBService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,14 +10,14 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 
 @Service
-public class JwtUserDetailsService implements UserDetailsService {
+public class UserJwtDetailsService implements UserDetailsService {
 
     @Autowired
-    private UserService userService;
+    private UserDBService userDBService;
 
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        org.example.model.User user = userService.getUserByUserName(login);
+        org.example.model.User user = userDBService.getUserByUserName(login);
         if(user == null) throw new UsernameNotFoundException("User not found with username: " + login);
         System.out.println(user.getPassword());
 

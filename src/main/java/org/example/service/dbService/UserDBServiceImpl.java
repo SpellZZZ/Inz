@@ -1,4 +1,4 @@
-package org.example.service;
+package org.example.service.dbService;
 
 
 import jakarta.transaction.Transactional;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserDBServiceImpl implements UserDBService {
     @Autowired
     private UserDAO userDAO;
     @Override

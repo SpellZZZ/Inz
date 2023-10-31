@@ -1,12 +1,11 @@
-package org.example.service;
+package org.example.service.dbService;
 
 
-import jakarta.transaction.Transactional;
 import org.example.model.User;
 
 import java.util.List;
 
-public interface UserService {
+public interface UserDBService {
     public List<User> getUsers();
     public void  saveUser(User user);
     public User getUser(int id);
