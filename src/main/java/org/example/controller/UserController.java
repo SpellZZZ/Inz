@@ -7,6 +7,7 @@ import org.example.dto.UserUpdateDto;
 import org.example.exceptions.JwtTokenException;
 import org.example.exceptions.UserAlreadyExistsException;
 import org.example.model.User;
+import org.example.service.JwtAuthService;
 import org.example.service.dbService.UserDBService;
 import org.example.service.managementService.UserManagementService;
 import org.example.util.JwtTokenUtil;
@@ -26,14 +27,17 @@ public class UserController {
     private final UserManagementService userManagementService;
     private final UserDBService userDBService;
     private final JwtTokenUtil jwtTokenUtil;
+    private final JwtAuthService jwtAuthService;
 
     @Autowired
     public UserController(UserManagementService userManagementService,
                           UserDBService userDBService,
-                          JwtTokenUtil jwtTokenUtil) {
+                          JwtTokenUtil jwtTokenUtil,
+                          JwtAuthService jwtAuthService) {
         this.userManagementService = userManagementService;
         this.userDBService = userDBService;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.jwtAuthService = jwtAuthService;
     }
 
     @GetMapping("/allUsers")
@@ -43,9 +47,10 @@ public class UserController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticateResponseDto> createAuthenticationToken(@RequestBody AuthenticationRequestDto authenticationRequest) throws Exception {
-        userManagementService.authenticate(authenticationRequest.getLoginUsername(), authenticationRequest.getLoginPassword());
+        jwtAuthService.authenticate(authenticationRequest.getLoginUsername(), authenticationRequest.getLoginPassword());
         final String token = jwtTokenUtil.generateToken(authenticationRequest.getLoginUsername());
-        return ResponseEntity.ok(new AuthenticateResponseDto(token));
+        final String role = userManagementService.getUserRole(authenticationRequest.getLoginUsername());
+        return ResponseEntity.ok(new AuthenticateResponseDto(token, role));
     }
 
     @PostMapping("/userRegister")
@@ -76,9 +81,12 @@ public class UserController {
     @PostMapping("/userUpdate")
     public ResponseEntity<Object> userUpdate(@RequestBody UserUpdateDto userUpdateDto,
                                              @RequestHeader("Authorization") String authorizationHeader) {
-        System.out.println(authorizationHeader);
+        System.out.println("123");
+        System.out.println("321");
         try {
             User user = updateUserFields(userUpdateDto, authorizationHeader);
+            System.out.println("test1");
+            System.out.println(authorizationHeader);
             userDBService.userUpdate(user);
             return ResponseHelper.createSuccessResponse("Zaktualizowano dane użytkownika");
         } catch (JwtTokenException ex) {
@@ -89,7 +97,7 @@ public class UserController {
     }
 
     private User updateUserFields(UserUpdateDto userUpdateDto, String authorizationHeader) {
-        final String token = userManagementService.authenticateToken(authorizationHeader);
+        final String token = jwtAuthService.authenticateToken(authorizationHeader);
         if (token == null) {
             throw new JwtTokenException("Wystąpił błąd z tokenem");
         }

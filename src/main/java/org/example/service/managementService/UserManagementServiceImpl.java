@@ -4,58 +4,42 @@ package org.example.service.managementService;
 import org.example.dto.RegisterFormDto;
 import org.example.dto.UserUpdateDto;
 import org.example.exceptions.JwtTokenException;
+import org.example.model.Role;
 import org.example.model.User;
+import org.example.service.JwtAuthService;
 import org.example.service.dbService.UserDBService;
 import org.example.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
 @Service
 public class UserManagementServiceImpl implements UserManagementService {
 
-    private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
+
     private final UserDBService userDBService;
     private final JwtTokenUtil jwtTokenUtil;
+    private final JwtAuthService jwtAuthService;
+
 
     @Autowired
     public UserManagementServiceImpl(
-            AuthenticationManager authenticationManager,
-            PasswordEncoder passwordEncoder,
+
             UserDBService userDBService,
-            JwtTokenUtil jwtTokenUtil
+            JwtTokenUtil jwtTokenUtil,
+            JwtAuthService jwtAuthService
     ) {
-        this.authenticationManager = authenticationManager;
-        this.passwordEncoder = passwordEncoder;
+
         this.userDBService = userDBService;
         this.jwtTokenUtil = jwtTokenUtil;
-    }
+        this.jwtAuthService = jwtAuthService;
 
-    @Override
-    public String authenticateToken(String authorizationHeader) {
-        return (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) ? authorizationHeader.substring(7) : null;
-    }
-
-    @Override
-    public void authenticate(String username, String password) throws Exception {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        } catch (DisabledException e) {
-            throw new Exception("USER_DISABLED", e);
-        } catch (BadCredentialsException e) {
-            throw new Exception("INVALID_CREDENTIALS", e);
-        }
     }
 
     @Override
     public User fillFields(RegisterFormDto registerFormDto) {
-        String hashedPassword = passwordEncoder.encode(registerFormDto.getRegisterPassword());
+        String hashedPassword = jwtAuthService.hashedPassword(registerFormDto.getRegisterPassword());
+
         User user = new User();
         user.setUsername(registerFormDto.getRegisterUsername());
         user.setPassword(hashedPassword);
@@ -67,12 +51,19 @@ public class UserManagementServiceImpl implements UserManagementService {
         return user;
     }
 
+
+    //todo sprawdz czy mail istniejes
     @Override
     public User updateFields(UserUpdateDto userUpdateDto, String authorizationHeader) {
-        final String token = authenticateToken(authorizationHeader);
+
+        System.out.println("xd");
+        final String token = jwtAuthService.authenticateToken(authorizationHeader);
+
+        System.out.println(authorizationHeader);
         if (token == null) {
             throw new JwtTokenException("Wystąpił błąd z tokenem");
         }
+        System.out.println(token);
 
         String userName = jwtTokenUtil.getUsernameFromToken(token);
         User user = userDBService.getUserByUserName(userName);
@@ -81,9 +72,16 @@ public class UserManagementServiceImpl implements UserManagementService {
             user.setEmail(userUpdateDto.getEmail());
         }
         if (userUpdateDto.getPassword() != null) {
-            String hashedPassword = passwordEncoder.encode(userUpdateDto.getPassword());
+            String hashedPassword = jwtAuthService.hashedPassword(userUpdateDto.getPassword());
             user.setPassword(hashedPassword);
         }
         return user;
+    }
+
+    @Override
+    public String getUserRole(String userName) {
+        User user = userDBService.getUserByUserName(userName);
+        Role userRole = user.getRole();
+        return userRole == null ? "" : userRole.getRole_name();
     }
 }

@@ -1,4 +1,4 @@
-package org.example.service.managementService;
+package org.example.service;
 
 import org.example.service.dbService.UserDBService;
 import org.springframework.beans.factory.annotation.Autowired;

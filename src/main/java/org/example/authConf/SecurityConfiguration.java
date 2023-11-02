@@ -1,7 +1,7 @@
 package org.example.authConf;
 
 
-import org.example.service.managementService.UserJwtDetailsService;
+import org.example.service.UserJwtDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
