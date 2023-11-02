@@ -1,6 +1,9 @@
 package org.example.service;
 
 
+import org.example.dto.UserUpdateDto;
+import org.example.exceptions.JwtTokenException;
+import org.example.model.User;
 import org.example.service.dbService.UserDBService;
 import org.example.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +51,6 @@ public class JwtAuthService {
     public String hashedPassword(String password){
       return   passwordEncoder.encode(password);
     }
-
-
-
 
 
 

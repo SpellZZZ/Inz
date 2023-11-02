@@ -1,11 +1,13 @@
 package org.example.controller;
 
-import org.example.dto.AuthenticateResponseDto;
-import org.example.dto.AuthenticationRequestDto;
-import org.example.dto.UserUpdateDto;
+import org.example.dto.*;
 import org.example.exceptions.JwtTokenException;
+import org.example.exceptions.ObjectAlreadyExistsException;
+import org.example.model.Company;
 import org.example.model.User;
+import org.example.service.dbService.CompanyDBService;
 import org.example.service.dbService.UserDBService;
+import org.example.service.managementService.CompanyManagementService;
 import org.example.service.managementService.UserManagementService;
 import org.example.util.JwtTokenUtil;
 import org.example.util.ResponseHelper;
@@ -13,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController("/company")
 public class CompanyController {
@@ -24,34 +24,51 @@ public class CompanyController {
     private final UserManagementService userManagementService;
     private final UserDBService userDBService;
     private final JwtTokenUtil jwtTokenUtil;
+    private final CompanyDBService companyDBService;
+    private final CompanyManagementService companyManagementService;
 
     @Autowired
     public CompanyController(UserManagementService userManagementService,
-                          UserDBService userDBService,
-                          JwtTokenUtil jwtTokenUtil) {
+                             UserDBService userDBService,
+                             JwtTokenUtil jwtTokenUtil,
+                             CompanyDBService companyDBService,
+                             CompanyManagementService companyManagementService) {
         this.userManagementService = userManagementService;
         this.userDBService = userDBService;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.companyDBService = companyDBService;
+        this.companyManagementService = companyManagementService;
     }
 
 
 
 
-  /*  @PostMapping("/companyCreate")
-    public ResponseEntity<Object> userUpdate(@RequestBody UserUpdateDto userUpdateDto,
+    @PostMapping("/companyCreate")
+    public ResponseEntity<Object> userUpdate(@RequestBody CompanyFormDto companyFormDto,
                                              @RequestHeader("Authorization") String authorizationHeader) {
 
         try {
-            User user = updateUserFields(userUpdateDto, authorizationHeader);
-            userDBService.userUpdate(user);
-            return ResponseHelper.createSuccessResponse("Zaktualizowano dane użytkownika");
+            validateCompanyNotExists(companyFormDto);
+            Company company = createCompanyFromDto(companyFormDto, authorizationHeader);
+            companyDBService.saveCompany(company);
+            return ResponseHelper.createSuccessResponse("Firma stworzona");
         } catch (JwtTokenException ex) {
             return ResponseHelper.createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (Exception ex) {
             return ResponseHelper.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Wystąpił błąd");
         }
+    }
 
-    }*/
+    private void validateCompanyNotExists(CompanyFormDto companyFormDto) {
+        if (companyDBService.getCompanyByName(companyFormDto.getCompany_name()) == null) {
+            throw new ObjectAlreadyExistsException("Obiekt już istnieje.");
+        }
+    }
+
+    private Company createCompanyFromDto(CompanyFormDto companyFormDto, String authorizationHeader) {
+        return companyManagementService.fillFields(companyFormDto, authorizationHeader);
+    }
+
 
 
 

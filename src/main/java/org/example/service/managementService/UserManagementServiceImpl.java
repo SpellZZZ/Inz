@@ -56,14 +56,11 @@ public class UserManagementServiceImpl implements UserManagementService {
     @Override
     public User updateFields(UserUpdateDto userUpdateDto, String authorizationHeader) {
 
-        System.out.println("xd");
         final String token = jwtAuthService.authenticateToken(authorizationHeader);
 
-        System.out.println(authorizationHeader);
         if (token == null) {
             throw new JwtTokenException("Wystąpił błąd z tokenem");
         }
-        System.out.println(token);
 
         String userName = jwtTokenUtil.getUsernameFromToken(token);
         User user = userDBService.getUserByUserName(userName);

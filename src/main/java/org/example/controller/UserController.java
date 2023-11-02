@@ -5,7 +5,7 @@ import org.example.dto.AuthenticationRequestDto;
 import org.example.dto.RegisterFormDto;
 import org.example.dto.UserUpdateDto;
 import org.example.exceptions.JwtTokenException;
-import org.example.exceptions.UserAlreadyExistsException;
+import org.example.exceptions.ObjectAlreadyExistsException;
 import org.example.model.User;
 import org.example.service.JwtAuthService;
 import org.example.service.dbService.UserDBService;
@@ -60,7 +60,7 @@ public class UserController {
             User user = createUserFromDto(registerFormDto);
             userDBService.saveUser(user);
             return ResponseHelper.createSuccessResponse("Udało się dodać użytkownika.");
-        } catch (UserAlreadyExistsException e) {
+        } catch (ObjectAlreadyExistsException e) {
             return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, e.getMessage());
         } catch (Exception e) {
             return ResponseHelper.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Wystąpił błąd podczas rejestracji użytkownika.");
@@ -70,7 +70,7 @@ public class UserController {
     private void validateUserNotExists(RegisterFormDto registerFormDto) {
         if (userDBService.getUserByUserName(registerFormDto.getRegisterUsername()) != null ||
                 userDBService.getUserByEmail(registerFormDto.getRegisterEmail()) != null) {
-            throw new UserAlreadyExistsException("Użytkownik o takim loginie lub emailu już istnieje.");
+            throw new ObjectAlreadyExistsException("Użytkownik o takim loginie lub emailu już istnieje.");
         }
     }
 
@@ -81,11 +81,8 @@ public class UserController {
     @PostMapping("/userUpdate")
     public ResponseEntity<Object> userUpdate(@RequestBody UserUpdateDto userUpdateDto,
                                              @RequestHeader("Authorization") String authorizationHeader) {
-        System.out.println("123");
-        System.out.println("321");
         try {
             User user = updateUserFields(userUpdateDto, authorizationHeader);
-            System.out.println("test1");
             System.out.println(authorizationHeader);
             userDBService.userUpdate(user);
             return ResponseHelper.createSuccessResponse("Zaktualizowano dane użytkownika");
