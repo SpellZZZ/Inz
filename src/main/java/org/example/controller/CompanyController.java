@@ -51,16 +51,20 @@ public class CompanyController {
             validateCompanyNotExists(companyFormDto);
             Company company = createCompanyFromDto(companyFormDto, authorizationHeader);
             companyDBService.saveCompany(company);
+            companyManagementService.setOwner(company, authorizationHeader);
             return ResponseHelper.createSuccessResponse("Firma stworzona");
         } catch (JwtTokenException ex) {
             return ResponseHelper.createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
-        } catch (Exception ex) {
+        } catch (ObjectAlreadyExistsException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+        }
+        catch (Exception ex) {
             return ResponseHelper.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Wystąpił błąd");
         }
     }
 
     private void validateCompanyNotExists(CompanyFormDto companyFormDto) {
-        if (companyDBService.getCompanyByName(companyFormDto.getCompany_name()) == null) {
+        if (companyDBService.getCompanyByName(companyFormDto.getCompany_name()) != null) {
             throw new ObjectAlreadyExistsException("Obiekt już istnieje.");
         }
     }

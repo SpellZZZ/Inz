@@ -8,6 +8,9 @@ import org.example.model.User;
 
 public interface CompanyManagementService {
 
+
+    public void setOwner(Company company, String authorizationHeader);
+
     Company fillFields(CompanyFormDto companyFormDto, String authorizationHeader);
     public Company updateFields(CompanyFormDto companyFormDto, String authorizationHeader);
 }

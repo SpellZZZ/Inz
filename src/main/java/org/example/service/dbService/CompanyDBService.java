@@ -11,4 +11,5 @@ public interface CompanyDBService {
     public void deleteCompany(int id);
     public Company getCompanyByName(String name);
     public void updateCompany(Company company);
+
 }

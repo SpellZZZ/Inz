@@ -6,9 +6,12 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+
+@Repository
 public class CompanyDAOImpl implements CompanyDAO{
 
     @Autowired
@@ -38,13 +41,13 @@ public class CompanyDAOImpl implements CompanyDAO{
     public void deleteCompany(int id) {
         Session currentSession = sessionFactory.getCurrentSession();
         Company company = currentSession.get(Company.class, id);
-
+        currentSession.remove(company);
     }
 
     @Override
     public Company getCompanyByName(String company_name) {
         Session currentSession = sessionFactory.getCurrentSession();
-        String hql = "FROM Company u WHERE u.company_name = :company_name";
+        String hql = "FROM Company c WHERE c.company_name = :company_name";
         Query<Company> query = currentSession.createQuery(hql, Company.class);
         query.setParameter("company_name", company_name);
         List<Company> company_ = query.getResultList();

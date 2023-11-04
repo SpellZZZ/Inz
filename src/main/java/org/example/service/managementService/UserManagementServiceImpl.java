@@ -62,8 +62,8 @@ public class UserManagementServiceImpl implements UserManagementService {
             throw new JwtTokenException("Wystąpił błąd z tokenem");
         }
 
-        String userName = jwtTokenUtil.getUsernameFromToken(token);
-        User user = userDBService.getUserByUserName(userName);
+
+        User user = getUserByToken(token);
 
         if (userUpdateDto.getEmail() != null) {
             user.setEmail(userUpdateDto.getEmail());
@@ -80,5 +80,11 @@ public class UserManagementServiceImpl implements UserManagementService {
         User user = userDBService.getUserByUserName(userName);
         Role userRole = user.getRole();
         return userRole == null ? "" : userRole.getRole_name();
+    }
+
+    @Override
+    public User getUserByToken(String token) {
+        String userName = jwtTokenUtil.getUsernameFromToken(token);
+        return userDBService.getUserByUserName(userName);
     }
 }
