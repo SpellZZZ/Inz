@@ -1,8 +1,10 @@
 package org.example.service.managementService;
 
 
+import org.example.dto.CompanyAddUserDto;
 import org.example.dto.CompanyFormDto;
 import org.example.exceptions.JwtTokenException;
+import org.example.exceptions.UserDoesntExistsException;
 import org.example.model.Company;
 import org.example.model.Role;
 import org.example.model.User;
@@ -78,13 +80,29 @@ public class CompanyManagementServiceImpl implements CompanyManagementService {
             throw new JwtTokenException("Wystąpił błąd z tokenem");
         }
 
-
-
-
         return null;
     }
 
+    @Override
+    public void addNewUser(CompanyAddUserDto companyAddUserDto, String authorizationHeader) {
 
+        final String token = jwtAuthService.authenticateToken(authorizationHeader);
+
+        if (token == null) {
+            throw new JwtTokenException("Wystąpił błąd z tokenem");
+        }
+
+        User owner = userManagementService.getUserByToken(token);
+        Company company = owner.getCompany();
+        User user = userDBService.getUserByUserName(companyAddUserDto.getUserLogin());
+
+        if(user == null) {
+            throw new UserDoesntExistsException("Nie ma takiego uzytkownika");
+        }
+
+        user.setCompany(company);
+        userDBService.userUpdate(user);
+    }
 
 
 }

@@ -1,5 +1,6 @@
 package org.example.service.managementService;
 
+import org.example.dto.CompanyAddUserDto;
 import org.example.dto.CompanyFormDto;
 import org.example.dto.RegisterFormDto;
 import org.example.dto.UserUpdateDto;
@@ -13,4 +14,6 @@ public interface CompanyManagementService {
 
     Company fillFields(CompanyFormDto companyFormDto, String authorizationHeader);
     public Company updateFields(CompanyFormDto companyFormDto, String authorizationHeader);
+
+    void addNewUser(CompanyAddUserDto companyAddUserDto, String authorizationHeader) throws Exception;
 }

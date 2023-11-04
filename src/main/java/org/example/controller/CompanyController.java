@@ -3,6 +3,7 @@ package org.example.controller;
 import org.example.dto.*;
 import org.example.exceptions.JwtTokenException;
 import org.example.exceptions.ObjectAlreadyExistsException;
+import org.example.exceptions.UserDoesntExistsException;
 import org.example.model.Company;
 import org.example.model.User;
 import org.example.service.dbService.CompanyDBService;
@@ -44,7 +45,7 @@ public class CompanyController {
 
 
     @PostMapping("/companyCreate")
-    public ResponseEntity<Object> userUpdate(@RequestBody CompanyFormDto companyFormDto,
+    public ResponseEntity<Object> companyCreate(@RequestBody CompanyFormDto companyFormDto,
                                              @RequestHeader("Authorization") String authorizationHeader) {
 
         try {
@@ -71,6 +72,28 @@ public class CompanyController {
 
     private Company createCompanyFromDto(CompanyFormDto companyFormDto, String authorizationHeader) {
         return companyManagementService.fillFields(companyFormDto, authorizationHeader);
+    }
+
+
+
+//testing
+    @PostMapping("/companyAddUser")
+    public ResponseEntity<Object> companyAddUser(@RequestBody CompanyAddUserDto companyAddUserDto,
+                                             @RequestHeader("Authorization") String authorizationHeader) {
+
+        try {
+            companyManagementService.addNewUser(companyAddUserDto, authorizationHeader);
+            return ResponseHelper.createSuccessResponse("Uzytkownik dodany");
+        } catch (JwtTokenException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        } catch (ObjectAlreadyExistsException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+        } catch (UserDoesntExistsException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+        }
+        catch (Exception ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Wystąpił błąd");
+        }
     }
 
 
