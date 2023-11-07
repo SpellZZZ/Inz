@@ -3,6 +3,7 @@ package org.example.service.dbService;
 
 import jakarta.transaction.Transactional;
 import org.example.dao.UserDAO;
+import org.example.model.Company;
 import org.example.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,5 +48,11 @@ public class UserDBServiceImpl implements UserDBService {
     @Transactional
     public void userUpdate(User user) {
         userDAO.updateUser(user);
+    }
+
+    @Override
+    @Transactional
+    public List<User> getUserByCompany(Company company){
+        return userDAO.getUserByCompany(company);
     }
 }

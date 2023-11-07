@@ -13,14 +13,14 @@ public class CompanyAddUserDto implements Serializable {
     private static final long serialVersionUID = 5926468583005150707L;
 
 
-    private String userLogin;
+    private String login;
 
 
     public CompanyAddUserDto() {
     }
 
-    public CompanyAddUserDto(String userLogin) {
-        this.userLogin = userLogin;
+    public CompanyAddUserDto(String login) {
+        this.login = login;
     }
 
 }

@@ -17,6 +17,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @RestController("/company")
 public class CompanyController {
 
@@ -97,7 +101,40 @@ public class CompanyController {
     }
 
 
+    @PostMapping("/companyUserSetRole")
+    public ResponseEntity<Object> companyUserSetRole(@RequestBody CompanyUserSetRoleDto companyUserSetRoleDto,
+                                                 @RequestHeader("Authorization") String authorizationHeader) {
 
+        try {
+            companyManagementService.setUserRole(companyUserSetRoleDto, authorizationHeader);
+            return ResponseHelper.createSuccessResponse("Rola zmieniona");
+        } catch (JwtTokenException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        } catch (ObjectAlreadyExistsException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+        } catch (UserDoesntExistsException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+        }
+        catch (Exception ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Wystąpił błąd");
+        }
+    }
+
+
+    @GetMapping("/companyGetUsers")
+    public ResponseEntity<List<CompanyUsersResponseDto>> companyGetUser(@RequestHeader("Authorization") String authorizationHeader) {
+            User user = userManagementService.getUserByToken(authorizationHeader);
+
+            List<CompanyUsersResponseDto> res = userDBService.getUserByCompany(user.getCompany())
+                    .stream().map(x -> {CompanyUsersResponseDto dto = new CompanyUsersResponseDto();
+                                        dto.setLogin(x.getUsername());
+                                        dto.setRole(x.getRole().getRole_name());
+                                        return dto;})
+                    .toList();
+
+
+        return ResponseEntity.ok(res);
+    }
 
 
 }

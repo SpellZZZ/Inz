@@ -3,7 +3,7 @@ package org.example.service.managementService;
 
 import org.example.dto.CompanyAddUserDto;
 import org.example.dto.CompanyFormDto;
-import org.example.exceptions.JwtTokenException;
+import org.example.dto.CompanyUserSetRoleDto;
 import org.example.exceptions.UserDoesntExistsException;
 import org.example.model.Company;
 import org.example.model.Role;
@@ -12,7 +12,6 @@ import org.example.service.JwtAuthService;
 import org.example.service.dbService.CompanyDBService;
 import org.example.service.dbService.RoleDBService;
 import org.example.service.dbService.UserDBService;
-import org.example.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -75,8 +74,11 @@ public class CompanyManagementServiceImpl implements CompanyManagementService {
     public void addNewUser(CompanyAddUserDto companyAddUserDto, String authorizationHeader) {
 
         User owner = userManagementService.getUserByToken(authorizationHeader);
+        System.out.println(owner.getUsername());
         Company company = owner.getCompany();
-        User user = userDBService.getUserByUserName(companyAddUserDto.getUserLogin());
+        User user = userDBService.getUserByUserName(companyAddUserDto.getLogin());
+        System.out.println(user.getUsername());
+        System.out.println(companyAddUserDto.getLogin());
 
         if(user == null) {
             throw new UserDoesntExistsException("Nie ma takiego uzytkownika");
@@ -84,6 +86,15 @@ public class CompanyManagementServiceImpl implements CompanyManagementService {
 
         user.setCompany(company);
         userDBService.userUpdate(user);
+    }
+
+    @Override
+    public void setUserRole(CompanyUserSetRoleDto companyUserSetRoleDto, String authorizationHeader) {
+        User user = userDBService.getUserByUserName(companyUserSetRoleDto.getLogin());
+        Role role = roleDBService.getRoleByName(companyUserSetRoleDto.getRole());
+        user.setRole(role);
+        userDBService.userUpdate(user);
+
     }
 
 

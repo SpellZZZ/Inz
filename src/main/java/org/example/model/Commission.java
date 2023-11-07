@@ -19,10 +19,6 @@ public class Commission {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int commission_id;
 
-    @Column(length = 6)
-    private String zip_code;
-
-
 
     private Date date_of_placement;
     private Date date_of_receipt;

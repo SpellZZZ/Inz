@@ -1,5 +1,6 @@
 package org.example.dao;
 
+import org.example.model.Company;
 import org.example.model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -64,5 +65,16 @@ public class UserDAOImpl implements  UserDAO{
     public void updateUser(User user) {
         Session currentSession = sessionFactory.getCurrentSession();
         currentSession.update(user);
+    }
+
+    @Override
+    public List<User> getUserByCompany(Company company) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        String hql = "FROM User u WHERE u.company = :company";
+        Query<User> query = currentSession.createQuery(hql, User.class);
+        query.setParameter("company", company);
+        List<User> users = query.getResultList();
+        return users;
     }
 }

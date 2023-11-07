@@ -6,6 +6,7 @@ import org.example.dto.RegisterFormDto;
 import org.example.dto.UserUpdateDto;
 import org.example.exceptions.JwtTokenException;
 import org.example.exceptions.ObjectAlreadyExistsException;
+import org.example.model.Role;
 import org.example.model.User;
 import org.example.service.JwtAuthService;
 import org.example.service.dbService.UserDBService;
@@ -101,4 +102,22 @@ public class UserController {
         User user = userManagementService.updateFields(userUpdateDto, authorizationHeader);
         return user;
     }
+
+
+
+
+
+
+    @PostMapping("/userRole")
+    public Role userRole(@RequestHeader("Authorization") String authorizationHeader) {
+        User user = userManagementService.getUserByToken(authorizationHeader);
+        Role role = user.getRole();
+        return role;
+    }
+
+
+
+
+
+
 }
