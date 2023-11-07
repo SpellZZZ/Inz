@@ -41,12 +41,8 @@ public class CompanyManagementServiceImpl implements CompanyManagementService {
     @Override
     public void setOwner(Company company, String authorizationHeader) {
 
-        final String token = jwtAuthService.authenticateToken(authorizationHeader);
+        User user = userManagementService.getUserByToken(authorizationHeader);
 
-        if (token == null) {
-            throw new JwtTokenException("Wystąpił błąd z tokenem");
-        }
-        User user = userManagementService.getUserByToken(token);
         user.setCompany(company);
         Role role = roleDBService.getRoleByName("Wlasciciel");
         user.setRole(role);
@@ -59,11 +55,7 @@ public class CompanyManagementServiceImpl implements CompanyManagementService {
     @Override
     public Company fillFields(CompanyFormDto companyFormDto, String authorizationHeader) {
 
-        final String token = jwtAuthService.authenticateToken(authorizationHeader);
-
-        if (token == null) {
-            throw new JwtTokenException("Wystąpił błąd z tokenem");
-        }
+        User owner = userManagementService.getUserByToken(authorizationHeader);
 
         Company company = new Company();
         company.setCompany_name(companyFormDto.getCompany_name());
@@ -74,11 +66,7 @@ public class CompanyManagementServiceImpl implements CompanyManagementService {
     @Override
     public Company updateFields(CompanyFormDto companyFormDto, String authorizationHeader) {
 
-        final String token = jwtAuthService.authenticateToken(authorizationHeader);
-
-        if (token == null) {
-            throw new JwtTokenException("Wystąpił błąd z tokenem");
-        }
+        User owner = userManagementService.getUserByToken(authorizationHeader);
 
         return null;
     }
@@ -86,13 +74,7 @@ public class CompanyManagementServiceImpl implements CompanyManagementService {
     @Override
     public void addNewUser(CompanyAddUserDto companyAddUserDto, String authorizationHeader) {
 
-        final String token = jwtAuthService.authenticateToken(authorizationHeader);
-
-        if (token == null) {
-            throw new JwtTokenException("Wystąpił błąd z tokenem");
-        }
-
-        User owner = userManagementService.getUserByToken(token);
+        User owner = userManagementService.getUserByToken(authorizationHeader);
         Company company = owner.getCompany();
         User user = userDBService.getUserByUserName(companyAddUserDto.getUserLogin());
 

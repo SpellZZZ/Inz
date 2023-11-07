@@ -83,7 +83,14 @@ public class UserManagementServiceImpl implements UserManagementService {
     }
 
     @Override
-    public User getUserByToken(String token) {
+    public User getUserByToken(String authorizationHeader) {
+
+        final String token = jwtAuthService.authenticateToken(authorizationHeader);
+
+        if (token == null) {
+            throw new JwtTokenException("Wystąpił błąd z tokenem");
+        }
+
         String userName = jwtTokenUtil.getUsernameFromToken(token);
         return userDBService.getUserByUserName(userName);
     }

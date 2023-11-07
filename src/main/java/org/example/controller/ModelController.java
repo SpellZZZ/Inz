@@ -1,2 +1,4 @@
-package org.example.controller;public class ModelController {
+package org.example.controller;
+
+public class ModelController {
 }

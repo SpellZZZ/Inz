@@ -59,7 +59,7 @@ public class SecurityConfiguration {
                         .requestMatchers(new MvcRequestMatcher(handlerMappingIntrospector,"/authenticate/**")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(handlerMappingIntrospector,"/userRegister/**")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(handlerMappingIntrospector,"/userRegister")).permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .exceptionHandling(excp -> excp.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

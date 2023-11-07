@@ -29,6 +29,9 @@ public class Trailer {
     private int max_payload;
     private int trailer_mass;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "company_id")
+    private Company company;
 
     @ManyToMany(mappedBy = "trailers")
     private Set<Truck> trucks = new HashSet<>();

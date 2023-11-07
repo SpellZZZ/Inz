@@ -1,2 +1,4 @@
-package org.example.controller;public class BrandController {
+package org.example.controller;
+
+public class BrandController {
 }

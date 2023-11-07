@@ -1,4 +1,4 @@
-package org.example.controller;
+package org.example.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -18,14 +18,14 @@ public class TrailerAddDto implements Serializable {
     private  int volume;
     private  int maxMass;
     private  int mass;
-    private  int dismount;
+    private  boolean dismount;
 
 
     public TrailerAddDto() {
     }
 
 
-    public TrailerAddDto(String token, int width, int height, int volume, int maxMass, int mass, int dismount) {
+    public TrailerAddDto(String token, int width, int height, int volume, int maxMass, int mass, boolean dismount) {
         this.token = token;
         this.width = width;
         this.height = height;

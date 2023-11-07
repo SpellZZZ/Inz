@@ -33,6 +33,10 @@ public class Truck {
     @JoinColumn(name = "model_id")
     private Model model;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "company_id")
+    private Company company;
+
 
     @ManyToMany(mappedBy = "trucks")
     private Set<User> users = new HashSet<>();
