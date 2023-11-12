@@ -14,6 +14,7 @@ public class TruckDto implements Serializable {
 
     private  String token;
     private  String model;
+    private  String brand;
     private  int mass;
     private  String licensePlate;
 
@@ -21,10 +22,11 @@ public class TruckDto implements Serializable {
     }
 
 
-    public TruckDto(String token, String model, int mass, String licensePlate) {
+    public TruckDto(String token, String model, int mass, String licensePlatem, String brand) {
         this.token = token;
         this.model = model;
         this.mass = mass;
         this.licensePlate = licensePlate;
+        this.brand = brand;
     }
 }
