@@ -30,9 +30,8 @@ public class Address {
     @Column(length = 10)
     private String GPS_Y;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "street_id")
-    private Street role;
+    @Column(length = 60)
+    private String address;
 
 
     @ManyToMany(mappedBy = "addresses")

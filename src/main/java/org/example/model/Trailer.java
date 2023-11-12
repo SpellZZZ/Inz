@@ -22,13 +22,15 @@ public class Trailer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int trailer_id;
 
+
     private double x;
     private double y;
     private double z;
     private boolean is_detachable;
     private int max_payload;
     private int trailer_mass;
-
+    @Column(length = 100)
+    private String description;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "company_id")
     private Company company;

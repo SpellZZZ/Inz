@@ -17,9 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController("/company")
 public class CompanyController {
@@ -123,7 +121,7 @@ public class CompanyController {
 
     @GetMapping("/companyGetUsers")
     public ResponseEntity<List<CompanyUsersResponseDto>> companyGetUser(@RequestHeader("Authorization") String authorizationHeader) {
-            User user = userManagementService.getUserByToken(authorizationHeader);
+            User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
 
             List<CompanyUsersResponseDto> res = userDBService.getUserByCompany(user.getCompany())
                     .stream().map(x -> {CompanyUsersResponseDto dto = new CompanyUsersResponseDto();

@@ -1,14 +1,11 @@
 package org.example.controller;
 
 
-import org.example.dto.CompanyAddUserDto;
-import org.example.dto.CompanyFormDto;
 import org.example.dto.TrailerAddDto;
 import org.example.dto.TruckAddDto;
 import org.example.exceptions.JwtTokenException;
 import org.example.exceptions.ObjectAlreadyExistsException;
 import org.example.exceptions.UserDoesntExistsException;
-import org.example.model.Company;
 import org.example.model.Trailer;
 import org.example.model.Truck;
 import org.example.model.User;
@@ -68,11 +65,11 @@ public class VehicleController {
         try {
 
 
-            User user = userManagementService.getUserByToken(authorizationHeader);
+            User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
             Truck truck = new Truck();
 
             truck.setCompany(user.getCompany());
-            truck.setModel(null);
+            truck.setModel(truckAddDto.getModel());
             truck.setTruck_mass(truckAddDto.getMass());
             truck.setRegistration_number(truckAddDto.getLicensePlate());
             truckDBService.saveTruck(truck);
@@ -97,7 +94,7 @@ public class VehicleController {
 
         try {
 
-            User user = userManagementService.getUserByToken(authorizationHeader);
+            User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
             Trailer trailer = new Trailer();
 
             trailer.setCompany(user.getCompany());

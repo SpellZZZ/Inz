@@ -9,5 +9,5 @@ public interface UserManagementService  {
     public User fillFields(RegisterFormDto registerFormDto);
     public User updateFields(UserUpdateDto userUpdateDto, String authorizationHeader);
     public String getUserRole(String userName);
-    public User getUserByToken(String token);
+    public User getUserByAuthorizationHeader(String token);
 }

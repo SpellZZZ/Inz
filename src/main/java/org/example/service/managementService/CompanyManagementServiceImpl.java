@@ -40,7 +40,7 @@ public class CompanyManagementServiceImpl implements CompanyManagementService {
     @Override
     public void setOwner(Company company, String authorizationHeader) {
 
-        User user = userManagementService.getUserByToken(authorizationHeader);
+        User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
 
         user.setCompany(company);
         Role role = roleDBService.getRoleByName("Wlasciciel");
@@ -54,7 +54,7 @@ public class CompanyManagementServiceImpl implements CompanyManagementService {
     @Override
     public Company fillFields(CompanyFormDto companyFormDto, String authorizationHeader) {
 
-        User owner = userManagementService.getUserByToken(authorizationHeader);
+        User owner = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
 
         Company company = new Company();
         company.setCompany_name(companyFormDto.getCompany_name());
@@ -65,7 +65,7 @@ public class CompanyManagementServiceImpl implements CompanyManagementService {
     @Override
     public Company updateFields(CompanyFormDto companyFormDto, String authorizationHeader) {
 
-        User owner = userManagementService.getUserByToken(authorizationHeader);
+        User owner = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
 
         return null;
     }
@@ -73,7 +73,7 @@ public class CompanyManagementServiceImpl implements CompanyManagementService {
     @Override
     public void addNewUser(CompanyAddUserDto companyAddUserDto, String authorizationHeader) {
 
-        User owner = userManagementService.getUserByToken(authorizationHeader);
+        User owner = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
         System.out.println(owner.getUsername());
         Company company = owner.getCompany();
         User user = userDBService.getUserByUserName(companyAddUserDto.getLogin());

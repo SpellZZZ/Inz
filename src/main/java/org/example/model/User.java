@@ -30,6 +30,15 @@ public class User {
     @Email
     String email;
 
+
+    @Column(length = 30)
+    @Email
+    String name;
+
+    @Column(length = 50)
+    @Email
+    String surname;
+
     Boolean deleted;
     @Column(length = 10)
     String password_recovery_link;

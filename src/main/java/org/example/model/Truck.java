@@ -28,10 +28,13 @@ public class Truck {
     @Column(length = 12)
     private String vin;
 
+    @Column(length = 100)
+    private String description;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "model_id")
-    private Model model;
+    @Column(length = 30)
+    private String model;
+    @Column(length = 30)
+    private String brand;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "company_id")

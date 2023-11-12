@@ -100,6 +100,8 @@ public class UserController {
         }
         String userName = jwtTokenUtil.getUsernameFromToken(token);
         User user = userManagementService.updateFields(userUpdateDto, authorizationHeader);
+        System.out.println("test5");
+
         return user;
     }
 
@@ -110,7 +112,7 @@ public class UserController {
 
     @PostMapping("/userRole")
     public Role userRole(@RequestHeader("Authorization") String authorizationHeader) {
-        User user = userManagementService.getUserByToken(authorizationHeader);
+        User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
         Role role = user.getRole();
         return role;
     }
