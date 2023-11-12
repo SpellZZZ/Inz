@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-public class TruckAddDto implements Serializable {
+public class TruckDto implements Serializable {
 
     private static final long serialVersionUID = 5926468583005150707L;
 
@@ -17,11 +17,11 @@ public class TruckAddDto implements Serializable {
     private  int mass;
     private  String licensePlate;
 
-    public TruckAddDto() {
+    public TruckDto() {
     }
 
 
-    public TruckAddDto(String token, String model, int mass, String licensePlate) {
+    public TruckDto(String token, String model, int mass, String licensePlate) {
         this.token = token;
         this.model = model;
         this.mass = mass;

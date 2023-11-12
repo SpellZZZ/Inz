@@ -1,6 +1,9 @@
 package org.example.dao;
 
+import org.example.model.Company;
+import org.example.model.Trailer;
 import org.example.model.Truck;
+import org.example.model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -54,5 +57,16 @@ public class TruckDAOImpl implements TruckDAO {
     public void updateTruck(Truck truck) {
         Session currentSession = sessionFactory.getCurrentSession();
         currentSession.update(truck);
+    }
+
+    @Override
+    public List<Truck> getTruckByCompany(Company company) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        String hql = "FROM Truck t WHERE t.company = :company";
+        Query<Truck> query = currentSession.createQuery(hql, Truck.class);
+        query.setParameter("company", company);
+        List<Truck> trucks = query.getResultList();
+        return trucks;
     }
 }

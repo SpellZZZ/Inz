@@ -2,7 +2,9 @@ package org.example.service.dbService;
 
 import jakarta.transaction.Transactional;
 import org.example.dao.TrailerDAO;
+import org.example.model.Company;
 import org.example.model.Trailer;
+import org.example.model.Truck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,5 +44,11 @@ public class TrailerDBServiceImpl implements TrailerDBService {
     @Transactional
     public void updateTrailer(Trailer trailer) {
         trailerDAO.updateTrailer(trailer);
+    }
+
+    @Override
+    @Transactional
+    public List<Trailer> getTrailerByCompany(Company company) {
+        return trailerDAO.getTrailerByCompany(company);
     }
 }

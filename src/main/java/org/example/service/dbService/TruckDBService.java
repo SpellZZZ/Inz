@@ -1,5 +1,6 @@
 package org.example.service.dbService;
 
+import org.example.model.Company;
 import org.example.model.Truck;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface TruckDBService {
     Truck getTruckByVin(String vin);
 
     void updateTruck(Truck truck);
+
+    List<Truck> getTruckByCompany(Company company);
 }

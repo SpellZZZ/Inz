@@ -1,8 +1,9 @@
 package org.example.controller;
 
 
-import org.example.dto.TrailerAddDto;
-import org.example.dto.TruckAddDto;
+import org.example.dto.CompanyUsersResponseDto;
+import org.example.dto.TrailerDto;
+import org.example.dto.TruckDto;
 import org.example.exceptions.JwtTokenException;
 import org.example.exceptions.ObjectAlreadyExistsException;
 import org.example.exceptions.UserDoesntExistsException;
@@ -20,10 +21,9 @@ import org.example.util.ResponseHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController("/vehicle")
 public class VehicleController {
@@ -59,7 +59,7 @@ public class VehicleController {
 
 
     @PostMapping("/addTruck")
-    public ResponseEntity<Object> companyCreate(@RequestBody TruckAddDto truckAddDto,
+    public ResponseEntity<Object> companyCreate(@RequestBody TruckDto truckAddDto,
                                                 @RequestHeader("Authorization") String authorizationHeader) {
 
         try {
@@ -89,7 +89,7 @@ public class VehicleController {
 
 
     @PostMapping("/addTrailer")
-    public ResponseEntity<Object> companyAddUser(@RequestBody TrailerAddDto trailerAddDto,
+    public ResponseEntity<Object> companyAddUser(@RequestBody TrailerDto trailerAddDto,
                                                  @RequestHeader("Authorization") String authorizationHeader) {
 
         try {
@@ -122,6 +122,48 @@ public class VehicleController {
     }
 
 
+
+
+    @GetMapping("/getTrucks")
+    public ResponseEntity<List<TruckDto>> getTrucks(@RequestHeader("Authorization") String authorizationHeader) {
+
+
+            User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+
+            List<TruckDto> res = truckDBService.getTruckByCompany(user.getCompany())
+                    .stream().map(x -> {TruckDto dto = new TruckDto();
+                        dto.setModel(x.getModel());
+                        dto.setMass(x.getTruck_mass());
+                        dto.setLicensePlate(x.getRegistration_number());
+                        return dto;})
+                    .toList();
+
+
+            return ResponseEntity.ok(res);
+
+    }
+
+    @GetMapping("/getTrailers")
+    public ResponseEntity<List<TrailerDto>> getTrailers(@RequestHeader("Authorization") String authorizationHeader) {
+
+
+        User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+
+        List<TrailerDto> res = trailerDBService.getTrailerByCompany(user.getCompany())
+                .stream().map(x -> {TrailerDto dto = new TrailerDto();
+                    dto.setDismount(x.is_detachable());
+                    dto.setVolume(x.getZ());
+                    dto.setHeight(x.getY());
+                    dto.setWidth(x.getX());
+                    dto.setMaxMass(x.getMax_payload());
+                    dto.setMass(x.getTrailer_mass());
+                    return dto;})
+                .toList();
+
+
+        return ResponseEntity.ok(res);
+
+    }
 
 
 

@@ -7,25 +7,25 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-public class TrailerAddDto implements Serializable {
+public class TrailerDto implements Serializable {
 
     private static final long serialVersionUID = 5926468583005150707L;
 
 
     private  String token;
-    private  int width;
-    private  int height;
-    private  int volume;
+    private  double width;
+    private  double height;
+    private  double volume;
     private  int maxMass;
     private  int mass;
     private  boolean dismount;
 
 
-    public TrailerAddDto() {
+    public TrailerDto() {
     }
 
 
-    public TrailerAddDto(String token, int width, int height, int volume, int maxMass, int mass, boolean dismount) {
+    public TrailerDto(String token, double width, double height, double volume, int maxMass, int mass, boolean dismount) {
         this.token = token;
         this.width = width;
         this.height = height;

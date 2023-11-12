@@ -2,6 +2,7 @@ package org.example.service.dbService;
 
 import jakarta.transaction.Transactional;
 import org.example.dao.TruckDAO;
+import org.example.model.Company;
 import org.example.model.Truck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,4 +50,11 @@ public class TruckDBServiceImpl implements TruckDBService {
     public void updateTruck(Truck truck) {
         truckDAO.updateTruck(truck);
     }
+
+    @Override
+    @Transactional
+    public List<Truck> getTruckByCompany(Company company) {
+        return truckDAO.getTruckByCompany(company);
+    }
+
 }

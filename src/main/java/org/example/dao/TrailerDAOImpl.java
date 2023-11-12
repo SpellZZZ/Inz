@@ -1,8 +1,12 @@
 package org.example.dao;
 
+import org.example.model.Company;
 import org.example.model.Trailer;
+import org.example.model.Truck;
+import org.example.model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -43,5 +47,16 @@ public class TrailerDAOImpl implements TrailerDAO {
     public void updateTrailer(Trailer trailer) {
         Session currentSession = sessionFactory.getCurrentSession();
         currentSession.update(trailer);
+    }
+
+    @Override
+    public List<Trailer> getTrailerByCompany(Company company) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        String hql = "FROM Trailer t WHERE t.company = :company";
+        Query<Trailer> query = currentSession.createQuery(hql, Trailer.class);
+        query.setParameter("company", company);
+        List<Trailer> trailers = query.getResultList();
+        return trailers;
     }
 }

@@ -1,6 +1,8 @@
 package org.example.service.dbService;
 
+import org.example.model.Company;
 import org.example.model.Trailer;
+import org.example.model.Truck;
 
 import java.util.List;
 
@@ -14,4 +16,5 @@ public interface TrailerDBService {
     void deleteTrailer(int id);
 
     void updateTrailer(Trailer trailer);
+    List<Trailer> getTrailerByCompany(Company company);
 }
