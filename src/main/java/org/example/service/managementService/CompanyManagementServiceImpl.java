@@ -97,5 +97,15 @@ public class CompanyManagementServiceImpl implements CompanyManagementService {
 
     }
 
+    @Override
+    public void delete(CompanyAddUserDto companyAddUserDto, String authorizationHeader) {
+        System.out.println(companyAddUserDto.getLogin());
+        User user = userDBService.getUserByUserName(companyAddUserDto.getLogin());
+        System.out.println(companyAddUserDto.getLogin());
+        user.setRole(null);
+        user.setCompany(null);
+        userDBService.userUpdate(user);
+    }
+
 
 }

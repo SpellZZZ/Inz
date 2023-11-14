@@ -98,6 +98,25 @@ public class CompanyController {
         }
     }
 
+    @PostMapping("/companyDeleteUser")
+    public ResponseEntity<Object> companyDeleteUser(@RequestBody CompanyAddUserDto companyAddUserDto,
+                                                 @RequestHeader("Authorization") String authorizationHeader) {
+
+        try {
+            companyManagementService.delete(companyAddUserDto, authorizationHeader);
+            return ResponseHelper.createSuccessResponse("Uzytkownik usuniety");
+        } catch (JwtTokenException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        } catch (ObjectAlreadyExistsException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+        } catch (UserDoesntExistsException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+        }
+        catch (Exception ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Wystąpił błąd");
+        }
+    }
+
 
     @PostMapping("/companyUserSetRole")
     public ResponseEntity<Object> companyUserSetRole(@RequestBody CompanyUserSetRoleDto companyUserSetRoleDto,

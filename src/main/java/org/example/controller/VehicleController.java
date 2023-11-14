@@ -59,7 +59,7 @@ public class VehicleController {
 
 
     @PostMapping("/addTruck")
-    public ResponseEntity<Object> companyCreate(@RequestBody TruckDto truckAddDto,
+    public ResponseEntity<Object> companyAddTruck(@RequestBody TruckDto truckAddDto,
                                                 @RequestHeader("Authorization") String authorizationHeader) {
 
         try {
@@ -89,7 +89,7 @@ public class VehicleController {
 
 
     @PostMapping("/addTrailer")
-    public ResponseEntity<Object> companyAddUser(@RequestBody TrailerDto trailerAddDto,
+    public ResponseEntity<Object> companyAddTrailer(@RequestBody TrailerDto trailerAddDto,
                                                  @RequestHeader("Authorization") String authorizationHeader) {
 
         try {
@@ -122,7 +122,68 @@ public class VehicleController {
     }
 
 
+    @PostMapping("/deleteTruck")
+    public ResponseEntity<Object> deleteTruck(@RequestBody TruckDto truckAddDto,
+                                                @RequestHeader("Authorization") String authorizationHeader) {
 
+        try {
+
+
+            User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+            Truck truck = new Truck();
+
+            truck.setCompany(user.getCompany());
+            truck.setModel(truckAddDto.getModel());
+            truck.setTruck_mass(truckAddDto.getMass());
+            truck.setRegistration_number(truckAddDto.getLicensePlate());
+            truckDBService.saveTruck(truck);
+
+
+            return ResponseHelper.createSuccessResponse("Pojazd dodany");
+        } catch (JwtTokenException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        } catch (ObjectAlreadyExistsException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+        }
+        catch (Exception ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Wystąpił błąd");
+        }
+    }
+
+
+
+    @PostMapping("/deleteTrailer")
+    public ResponseEntity<Object> deleteTrailer(@RequestBody TrailerDto trailerAddDto,
+                                                 @RequestHeader("Authorization") String authorizationHeader) {
+
+        try {
+
+            User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+            Trailer trailer = new Trailer();
+
+            trailer.setCompany(user.getCompany());
+            trailer.set_detachable(trailerAddDto.isDismount());
+            trailer.setTrailer_mass(trailerAddDto.getMass());
+            trailer.setMax_payload(trailerAddDto.getMaxMass());
+            trailer.setX(trailerAddDto.getWidth());
+            trailer.setY(trailerAddDto.getHeight());
+            trailer.setZ(trailerAddDto.getVolume());
+
+            trailerDBService.saveTrailer(trailer);
+
+
+            return ResponseHelper.createSuccessResponse("Naczepa dodana");
+        } catch (JwtTokenException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        } catch (ObjectAlreadyExistsException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+        } catch (UserDoesntExistsException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+        }
+        catch (Exception ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Wystąpił błąd");
+        }
+    }
 
     @GetMapping("/getTrucks")
     public ResponseEntity<List<TruckDto>> getTrucks(@RequestHeader("Authorization") String authorizationHeader) {
