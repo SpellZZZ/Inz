@@ -145,6 +145,8 @@ public class CompanyController {
             List<CompanyUsersResponseDto> res = userDBService.getUserByCompany(user.getCompany())
                     .stream().map(x -> {CompanyUsersResponseDto dto = new CompanyUsersResponseDto();
                                         dto.setLogin(x.getUsername());
+                                        dto.setName(x.getName());
+                                        dto.setSurname(x.getSurname());
                                         dto.setRole(x.getRole().getRole_name());
                                         return dto;})
                     .toList();

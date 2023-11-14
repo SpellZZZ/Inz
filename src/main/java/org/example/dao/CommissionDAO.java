@@ -1,6 +1,9 @@
 package org.example.dao;
 
 import org.example.model.Commission;
+import org.example.model.Company;
+import org.example.model.Truck;
+import org.example.model.User;
 
 import java.util.List;
 
@@ -15,4 +18,5 @@ public interface CommissionDAO {
     void deleteCommission(int id);
 
     void updateCommission(Commission commission);
+    public List<Commission> getCommissionByUser(User user);
 }

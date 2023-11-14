@@ -16,20 +16,20 @@ public class CommissionDto implements Serializable {
 
     private String zip_codeStart;
     private String house_numberStart;
-    private String GPS_XStart;
-    private String GPS_YStart;
+    private Double GPS_XStart;
+    private Double GPS_YStart;
     private String addressStart;
     private String zip_codeEnd;
     private String house_numberEnd;
-    private String GPS_XEnd;
-    private String GPS_YEnd;
+    private Double GPS_XEnd;
+    private Double GPS_YEnd;
     private String addressEnd;
 
 
     private String description;
-    private Double X;
-    private Double Y;
-    private Double Z;
+    private Double xPackage;
+    private Double yPackage;
+    private Double zPackage;
     private Double mass;
     private Boolean stackable;
     private int count;
@@ -37,7 +37,7 @@ public class CommissionDto implements Serializable {
     public CommissionDto() {
     }
 
-    public CommissionDto(String zip_codeStart, String house_numberStart, String GPS_XStart, String GPS_YStart, String addressStart, String zip_codeEnd, String house_numberEnd, String GPS_XEnd, String GPS_YEnd, String addressEnd, String description, Double x, Double y, Double z, Double mass, Boolean stackable, int count) {
+    public CommissionDto(String zip_codeStart, String house_numberStart, Double GPS_XStart, Double GPS_YStart, String addressStart, String zip_codeEnd, String house_numberEnd, Double GPS_XEnd, Double GPS_YEnd, String addressEnd, String description, Double xPackage, Double yPackage, Double zPackage, Double mass, Boolean stackable, int count) {
         this.zip_codeStart = zip_codeStart;
         this.house_numberStart = house_numberStart;
         this.GPS_XStart = GPS_XStart;
@@ -49,9 +49,9 @@ public class CommissionDto implements Serializable {
         this.GPS_YEnd = GPS_YEnd;
         this.addressEnd = addressEnd;
         this.description = description;
-        this.X = x;
-        this.Y = y;
-        this.Z = z;
+        this.xPackage = xPackage;
+        this.yPackage = yPackage;
+        this.zPackage = zPackage;
         this.mass = mass;
         this.stackable = stackable;
         this.count = count;

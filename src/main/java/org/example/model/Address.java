@@ -25,10 +25,9 @@ public class Address {
     private String zip_code;
     @Column(length = 10)
     private String house_number;
-    @Column(length = 10)
-    private String GPS_X;
-    @Column(length = 10)
-    private String GPS_Y;
+
+    private Double GPS_X;
+    private Double GPS_Y;
 
     @Column(length = 60)
     private String address;

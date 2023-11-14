@@ -1,8 +1,12 @@
 package org.example.dao;
 
 import org.example.model.Commission;
+import org.example.model.Company;
+import org.example.model.Trailer;
+import org.example.model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -44,4 +48,18 @@ public class CommissionDAOImpl implements CommissionDAO {
         Session currentSession = sessionFactory.getCurrentSession();
         currentSession.update(commission);
     }
+
+    @Override
+    public List<Commission> getCommissionByUser(User user) {
+
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        String hql = "FROM Commission c WHERE c.user = :user";
+        Query<Commission> query = currentSession.createQuery(hql, Commission.class);
+        query.setParameter("user", user);
+        List<Commission> commissions = query.getResultList();
+        return commissions;
+
+    }
+
 }

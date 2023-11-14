@@ -4,6 +4,7 @@ package org.example.service.dbService;
 import jakarta.transaction.Transactional;
 import org.example.dao.CommissionDAO;
 import org.example.model.Commission;
+import org.example.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,5 +44,11 @@ public class CommissionDBServiceImpl implements CommissionDBService{
     @Transactional
     public void updateCommission(Commission commission) {
         commissionDAO.updateCommission(commission);
+    }
+
+    @Override
+    @Transactional
+    public List<Commission> getCommissionByUser(User user) {
+        return commissionDAO.getCommissionByUser(user);
     }
 }
