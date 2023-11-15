@@ -64,7 +64,12 @@ public class UserManagementServiceImpl implements UserManagementService {
     public User updateFields(UserUpdateDto userUpdateDto, String authorizationHeader) {
 
         User user = getUserByAuthorizationHeader(authorizationHeader);
-
+        if (userUpdateDto.getName() != null) {
+            user.setName(userUpdateDto.getName());
+        }
+        if (userUpdateDto.getSurname() != null) {
+            user.setSurname(userUpdateDto.getSurname());
+        }
         if (userUpdateDto.getEmail() != null) {
             user.setEmail(userUpdateDto.getEmail());
         }

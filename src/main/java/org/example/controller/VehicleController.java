@@ -1,7 +1,6 @@
 package org.example.controller;
 
 
-import org.example.dto.CompanyUsersResponseDto;
 import org.example.dto.TrailerDto;
 import org.example.dto.TruckDto;
 import org.example.exceptions.JwtTokenException;
