@@ -1,18 +1,14 @@
 package org.example.controller;
 
 
+import org.example.dto.BindDriverTruckTrailerDto;
 import org.example.dto.TrailerDto;
 import org.example.dto.TruckDto;
 import org.example.exceptions.JwtTokenException;
 import org.example.exceptions.ObjectAlreadyExistsException;
 import org.example.exceptions.UserDoesntExistsException;
-import org.example.model.Trailer;
-import org.example.model.Truck;
-import org.example.model.User;
-import org.example.service.dbService.CompanyDBService;
-import org.example.service.dbService.TrailerDBService;
-import org.example.service.dbService.TruckDBService;
-import org.example.service.dbService.UserDBService;
+import org.example.model.*;
+import org.example.service.dbService.*;
 import org.example.service.managementService.CompanyManagementService;
 import org.example.service.managementService.UserManagementService;
 import org.example.util.JwtTokenUtil;
@@ -23,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController("/vehicle")
 public class VehicleController {
@@ -36,6 +33,9 @@ public class VehicleController {
     private final CompanyManagementService companyManagementService;
     private final TruckDBService truckDBService;
     private final TrailerDBService trailerDBService;
+    private final TruckTrailerDBService truckTrailerDBService;
+    private final UserTruckDBService userTruckDBService;
+
 
     @Autowired
     public VehicleController(UserManagementService userManagementService,
@@ -44,7 +44,9 @@ public class VehicleController {
                              CompanyDBService companyDBService,
                              CompanyManagementService companyManagementService,
                              TruckDBService truckDBService,
-                             TrailerDBService trailerDBService) {
+                             TrailerDBService trailerDBService,
+                             TruckTrailerDBService truckTrailerDBService,
+                             UserTruckDBService userTruckDBService) {
         this.userManagementService = userManagementService;
         this.userDBService = userDBService;
         this.jwtTokenUtil = jwtTokenUtil;
@@ -52,6 +54,8 @@ public class VehicleController {
         this.companyManagementService = companyManagementService;
         this.truckDBService = truckDBService;
         this.trailerDBService = trailerDBService;
+        this.truckTrailerDBService = truckTrailerDBService;
+        this.userTruckDBService = userTruckDBService;
     }
 
 
@@ -185,45 +189,58 @@ public class VehicleController {
     }
 
     @GetMapping("/getTrucks")
-    public ResponseEntity<List<TruckDto>> getTrucks(@RequestHeader("Authorization") String authorizationHeader) {
-
+    public ResponseEntity<List<Truck>> getTrucks(@RequestHeader("Authorization") String authorizationHeader) {
 
             User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
-
-            List<TruckDto> res = truckDBService.getTruckByCompany(user.getCompany())
-                    .stream().map(x -> {TruckDto dto = new TruckDto();
-                        dto.setModel(x.getModel());
-                        dto.setMass(x.getTruck_mass());
-                        dto.setLicensePlate(x.getRegistration_number());
-                        return dto;})
-                    .toList();
-
-
+            List<Truck> res = truckDBService.getTruckByCompany(user.getCompany());
             return ResponseEntity.ok(res);
 
     }
 
     @GetMapping("/getTrailers")
-    public ResponseEntity<List<TrailerDto>> getTrailers(@RequestHeader("Authorization") String authorizationHeader) {
-
-
+    public ResponseEntity<List<Trailer>> getTrailers(@RequestHeader("Authorization") String authorizationHeader) {
         User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
 
-        List<TrailerDto> res = trailerDBService.getTrailerByCompany(user.getCompany())
-                .stream().map(x -> {TrailerDto dto = new TrailerDto();
-                    dto.setDismount(x.is_detachable());
-                    dto.setVolume(x.getZ());
-                    dto.setHeight(x.getY());
-                    dto.setWidth(x.getX());
-                    dto.setMaxMass(x.getMax_payload());
-                    dto.setMass(x.getTrailer_mass());
-                    return dto;})
-                .toList();
-
-
+        List<Trailer> res = trailerDBService.getTrailerByCompany(user.getCompany());
         return ResponseEntity.ok(res);
-
     }
+
+    @PostMapping("/bindDriverTruckTrailer")
+    public ResponseEntity<Object> bindDriverTruckTrailer(@RequestHeader("Authorization") String authorizationHeader, @RequestBody BindDriverTruckTrailerDto bindDriverTruckTrailerDto) {
+        //User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+
+        //List<User> users = userDBService.getUserByCompany(user.getCompany());
+
+
+        User user = userDBService.getUser(bindDriverTruckTrailerDto.getUser_id());
+        Truck truck = truckDBService.getTruck(bindDriverTruckTrailerDto.getTruck_id());
+        Trailer trailer = trailerDBService.getTrailer(bindDriverTruckTrailerDto.getTrailer_id());
+
+
+        User_Truck userTruck = new User_Truck();
+        userTruck.setTruck(truck);
+        userTruck.setUser(user);
+        userTruckDBService.saveUserTruck(userTruck);
+
+        Truck_Trailer truckTrailer = new Truck_Trailer();
+        truckTrailer.setTrailer(trailer);
+        truckTrailer.setTruck(truck);
+        truckTrailerDBService.saveTruckTrailer(truckTrailer);
+
+        return ResponseEntity.ok("Połączono");
+    }
+
+    @PostMapping("/unbindDriverTruckTrailer")
+    public ResponseEntity<Object> unbindDriverTruckTrailer(@RequestHeader("Authorization") String authorizationHeader, @RequestBody BindDriverTruckTrailerDto bindDriverTruckTrailerDto) {
+        //User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+
+        //List<User> users = userDBService.getUserByCompany(user.getCompany());
+
+
+
+        return ResponseEntity.ok("Połączono");
+    }
+
 
 
 

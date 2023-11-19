@@ -7,6 +7,7 @@ import org.example.dto.UserUpdateDto;
 import org.example.exceptions.JwtTokenException;
 import org.example.exceptions.ObjectAlreadyExistsException;
 import org.example.model.Role;
+import org.example.model.Trailer;
 import org.example.model.User;
 import org.example.service.JwtAuthService;
 import org.example.service.dbService.UserDBService;
@@ -20,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController("/user")
 public class UserController {
@@ -116,6 +118,19 @@ public class UserController {
         Role role = user.getRole();
         return role;
     }
+
+    @GetMapping("/getDrivers")
+    public ResponseEntity<List<User>> getDrivers(@RequestHeader("Authorization") String authorizationHeader) {
+        User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+
+        List<User> res = userDBService.getUserByCompany(user.getCompany()).stream().filter(
+                x -> x.getRole().getRole_name().equals("Kierowca") )
+                .collect(Collectors.toList());;
+
+        return ResponseEntity.ok(res);
+    }
+
+
 
 
 

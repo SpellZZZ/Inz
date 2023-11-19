@@ -46,7 +46,7 @@ public class TrailerDAOImpl implements TrailerDAO {
     @Override
     public void updateTrailer(Trailer trailer) {
         Session currentSession = sessionFactory.getCurrentSession();
-        currentSession.update(trailer);
+        currentSession.merge(trailer);
     }
 
     @Override
