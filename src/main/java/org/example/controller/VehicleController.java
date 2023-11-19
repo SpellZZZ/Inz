@@ -237,8 +237,24 @@ public class VehicleController {
         //List<User> users = userDBService.getUserByCompany(user.getCompany());
 
 
+        User_Truck userTruck = userTruckDBService.getUserTrucks().stream()
+                .filter(x->
+                        x.getUser().getUser_id()==bindDriverTruckTrailerDto.getUser_id()
+                && x.getTruck().getTruck_id()== bindDriverTruckTrailerDto.getTruck_id()).findFirst().get();
 
-        return ResponseEntity.ok("Połączono");
+        Truck_Trailer truckTrailer = truckTrailerDBService.getTruckTrailers().stream()
+                        .filter(x->
+                                x.getTruck().getTruck_id()== bindDriverTruckTrailerDto.getTruck_id()
+                        && x.getTrailer().getTrailer_id() == bindDriverTruckTrailerDto.getTrailer_id()).findFirst().get();
+
+
+        userTruckDBService.deleteUserTruck(userTruck.getUser_truck_id());
+        truckTrailerDBService.deleteTruckTrailer(truckTrailer.getId());
+
+
+
+
+        return ResponseEntity.ok("Rozłączono");
     }
 
 

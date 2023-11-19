@@ -1,6 +1,8 @@
 package org.example.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,6 +44,7 @@ public class Truck {
 
 
     @ManyToMany(mappedBy = "trucks")
+    @JsonBackReference
     private Set<User> users = new HashSet<>();
 
 
@@ -50,6 +53,7 @@ public class Truck {
     @JoinTable(name = "Truck_Trailer",
             joinColumns = @JoinColumn(name = "truck_id"),
             inverseJoinColumns = @JoinColumn(name = "trailer_id"))
+    @JsonManagedReference
     private Set<Trailer> trailers = new HashSet<>();
 
 
