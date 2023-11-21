@@ -21,7 +21,7 @@ public class Route_Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private int point_number;
+    private Integer point_number;
 
     @ManyToOne
     @JoinColumn(name = "route_id")

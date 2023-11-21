@@ -1,15 +1,13 @@
 package org.example.controller;
 
 
-import org.example.dao.CommissionDAO;
+import org.example.dto.AddCommissionToRouteDto;
 import org.example.dto.CommissionDto;
-import org.example.dto.CompanyFormDto;
-import org.example.dto.CompanyUsersResponseDto;
 import org.example.exceptions.JwtTokenException;
 import org.example.exceptions.ObjectAlreadyExistsException;
 import org.example.model.Address;
 import org.example.model.Commission;
-import org.example.model.Company;
+import org.example.model.Route;
 import org.example.model.User;
 import org.example.service.dbService.*;
 import org.example.service.managementService.CompanyManagementService;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.List;
 
 @RestController("/commission")
@@ -137,10 +134,52 @@ public class CommissionController {
 
     @GetMapping("/getCommissions")
     public ResponseEntity<List<Commission>> getCommissions(@RequestHeader("Authorization") String authorizationHeader) {
-        List<Commission> res = commissionDBService.getCommissions();
+        List<Commission> commissions = commissionDBService.getCommissions();
+        List<Commission> res = commissions.stream().filter(x ->
+                                x.getRoute() == null).toList();
+
+
+
         return ResponseEntity.ok(res);
     }
 
+    @PostMapping("/addCommissionToRoute")
+    public ResponseEntity<Object> addCommissionToRoute(@RequestHeader("Authorization") String authorizationHeader,
+                                            @RequestBody AddCommissionToRouteDto addCommissionToRouteDto) {
+
+
+        Route route = routeDBService.getRoute(Integer.valueOf(addCommissionToRouteDto.getRoute_id()));
+
+        for(int i = 0 ; i < addCommissionToRouteDto.getPackages().size(); i++){
+            Commission c = commissionDBService.getCommission(addCommissionToRouteDto.getPackages().get(i));
+            c.setRoute(route);
+            commissionDBService.updateCommission(c);
+        }
+
+        return ResponseHelper.createSuccessResponse("Dodano paczki do przejazdu");
+    }
+
+
+    @PostMapping("/commissionLoaded")
+    public ResponseEntity<Object> commissionLoaded(@RequestHeader("Authorization") String authorizationHeader, @RequestParam int id) {
+
+        Commission commission = commissionDBService.getCommission(id);
+        commission.setIs_loaded(!commission.getIs_loaded());
+        commissionDBService.updateCommission(commission);
+        return ResponseEntity.ok("Zmieniono status");
+    }
+
+
+
+
+    @PostMapping("/commissionUnloaded")
+    public ResponseEntity<Object> getCommissions(@RequestHeader("Authorization") String authorizationHeader, @RequestParam int id) {
+        Commission commission = commissionDBService.getCommission(id);
+        commission.setIs_unloaded(!commission.getIs_unloaded());
+        commissionDBService.updateCommission(commission);
+        return ResponseEntity.ok("Zmieniono status");
+
+    }
 
 
 }

@@ -1,6 +1,7 @@
 package org.example.service.dbService;
 
 import org.example.model.Commission;
+import org.example.model.Route;
 import org.example.model.User;
 
 import java.util.List;
@@ -16,5 +17,6 @@ public interface CommissionDBService {
 
     void updateCommission(Commission commission);
     public List<Commission> getCommissionByUser(User user);
+    public List<Commission> getCommissionByRoute(Route route);
 
 }

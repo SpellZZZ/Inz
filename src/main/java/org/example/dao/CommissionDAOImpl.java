@@ -1,9 +1,6 @@
 package org.example.dao;
 
-import org.example.model.Commission;
-import org.example.model.Company;
-import org.example.model.Trailer;
-import org.example.model.User;
+import org.example.model.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -60,6 +57,17 @@ public class CommissionDAOImpl implements CommissionDAO {
         List<Commission> commissions = query.getResultList();
         return commissions;
 
+    }
+
+    @Override
+    public List<Commission> getCommissionByRoute(Route route) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        String hql = "FROM Commission c WHERE c.route = :route";
+        Query<Commission> query = currentSession.createQuery(hql, Commission.class);
+        query.setParameter("route", route);
+        List<Commission> commissions = query.getResultList();
+        return commissions;
     }
 
 }

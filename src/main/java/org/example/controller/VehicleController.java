@@ -1,9 +1,7 @@
 package org.example.controller;
 
 
-import org.example.dto.BindDriverTruckTrailerDto;
-import org.example.dto.TrailerDto;
-import org.example.dto.TruckDto;
+import org.example.dto.*;
 import org.example.exceptions.JwtTokenException;
 import org.example.exceptions.ObjectAlreadyExistsException;
 import org.example.exceptions.UserDoesntExistsException;
@@ -18,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,6 +36,7 @@ public class VehicleController {
     private final TrailerDBService trailerDBService;
     private final TruckTrailerDBService truckTrailerDBService;
     private final UserTruckDBService userTruckDBService;
+    private final RouteDBService routeDBService;
 
 
     @Autowired
@@ -47,7 +48,8 @@ public class VehicleController {
                              TruckDBService truckDBService,
                              TrailerDBService trailerDBService,
                              TruckTrailerDBService truckTrailerDBService,
-                             UserTruckDBService userTruckDBService) {
+                             UserTruckDBService userTruckDBService,
+                             RouteDBService routeDBService) {
         this.userManagementService = userManagementService;
         this.userDBService = userDBService;
         this.jwtTokenUtil = jwtTokenUtil;
@@ -57,6 +59,7 @@ public class VehicleController {
         this.trailerDBService = trailerDBService;
         this.truckTrailerDBService = truckTrailerDBService;
         this.userTruckDBService = userTruckDBService;
+        this.routeDBService = routeDBService;
     }
 
 
@@ -273,6 +276,52 @@ public class VehicleController {
         return ResponseEntity.ok(res);
     }
 
+
+    @GetMapping("/getBindedTrucks")
+    public ResponseEntity<List<BindedTrucksDto>> getBindedTrucks(@RequestHeader("Authorization") String authorizationHeader) {
+        User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+
+        List<User> users = userDBService.getUserByCompany(user.getCompany()).stream().filter(
+                        x -> x.getRole().getRole_name().equals("Kierowca")
+                                && x.getTrucks().size() > 0)
+                .collect(Collectors.toList());
+
+
+
+        List<BindedTrucksDto> trucks = users
+                .stream().map(x -> {BindedTrucksDto dto = new BindedTrucksDto();
+                    dto.setTruck_id(userTruckDBService.getUserTrucks().stream()
+                            .filter(y->
+                                    y.getUser().getUser_id()==x.getUser_id()).findFirst().get().getTruck().getTruck_id());
+                    dto.setTrailer_id(truckTrailerDBService.getTruckTrailers().stream()
+                            .filter(y ->
+                                    y.getUser_id() == x.getUser_id()).findFirst().get().getTrailer().getTrailer_id());
+
+                    dto.setTruckModel(truckDBService.getTruck(dto.getTruck_id()).getModel());
+                    dto.setTruckReg(truckDBService.getTruck(dto.getTruck_id()).getRegistration_number());
+
+                    dto.setTrailerDesc(trailerDBService.getTrailer(dto.getTrailer_id()).getDescription());
+                    dto.setToString(
+                            dto.getTruckModel() + " " +
+                            dto.getTruckReg() + " " +
+                            dto.getTrailerDesc());
+
+                    return dto;})
+                .toList();
+
+        List<BindedTrucksDto> res = new ArrayList<>();
+
+        Set<String> unique = new HashSet<>();
+
+        for(BindedTrucksDto s : trucks){
+            if(unique.add(s.getToString())){
+                res.add(s);
+            }
+        }
+
+
+        return ResponseEntity.ok(res);
+    }
 
 
 

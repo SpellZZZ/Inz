@@ -26,6 +26,9 @@ public class Address {
     @Column(length = 10)
     private String house_number;
 
+    @Column(length = 10)
+    private String city;
+
     private Double GPS_X;
     private Double GPS_Y;
 

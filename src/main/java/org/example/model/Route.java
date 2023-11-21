@@ -1,5 +1,7 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +24,9 @@ public class Route {
     private int route_id;
     private Date date_start;
     private Date date_end;
+    private String name;
+    private boolean status;
+
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "truck_id")
@@ -30,6 +35,11 @@ public class Route {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "company_id")
+    private Company company;
+
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "Route_Address",

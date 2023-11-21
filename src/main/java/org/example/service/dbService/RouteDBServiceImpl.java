@@ -3,7 +3,9 @@ package org.example.service.dbService;
 
 import jakarta.transaction.Transactional;
 import org.example.dao.RouteDAO;
+import org.example.model.Company;
 import org.example.model.Route;
+import org.example.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +49,17 @@ public class RouteDBServiceImpl implements RouteDBService {
     @Transactional
     public void updateRoute(Route route) {
         routeDAO.updateRoute(route);
+    }
+
+    @Override
+    @Transactional
+    public List<Route> getRouteByCompany(Company company) {
+        return routeDAO.getRouteByCompany(company);
+    }
+
+    @Override
+    public List<Route> getRouteByUser(User user) {
+        return routeDAO.getRouteByUser(user);
     }
 
 }

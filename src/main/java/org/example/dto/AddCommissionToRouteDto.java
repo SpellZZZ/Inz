@@ -10,17 +10,17 @@ import java.util.List;
 
 @Getter
 @Setter
-public class AddCommissionToRoute implements Serializable {
+public class AddCommissionToRouteDto implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 5926468583005150707L;
 
     private String route_id;
     private List<Integer> packages;
 
-    public AddCommissionToRoute() {
+    public AddCommissionToRouteDto() {
     }
 
-    public AddCommissionToRoute(String route_id, List<Integer> packages) {
+    public AddCommissionToRouteDto(String route_id, List<Integer> packages) {
         this.route_id = route_id;
         this.packages = packages;
     }
