@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController("/vehicle")
 public class VehicleController {
@@ -216,6 +217,7 @@ public class VehicleController {
         Truck truck = truckDBService.getTruck(bindDriverTruckTrailerDto.getTruck_id());
         Trailer trailer = trailerDBService.getTrailer(bindDriverTruckTrailerDto.getTrailer_id());
 
+        System.out.println(bindDriverTruckTrailerDto.getTruck_id());
 
         User_Truck userTruck = new User_Truck();
         userTruck.setTruck(truck);
@@ -225,6 +227,7 @@ public class VehicleController {
         Truck_Trailer truckTrailer = new Truck_Trailer();
         truckTrailer.setTrailer(trailer);
         truckTrailer.setTruck(truck);
+        truckTrailer.setUser_id(user.getUser_id());
         truckTrailerDBService.saveTruckTrailer(truckTrailer);
 
         return ResponseEntity.ok("Połączono");
@@ -245,7 +248,8 @@ public class VehicleController {
         Truck_Trailer truckTrailer = truckTrailerDBService.getTruckTrailers().stream()
                         .filter(x->
                                 x.getTruck().getTruck_id()== bindDriverTruckTrailerDto.getTruck_id()
-                        && x.getTrailer().getTrailer_id() == bindDriverTruckTrailerDto.getTrailer_id()).findFirst().get();
+                        && x.getTrailer().getTrailer_id() == bindDriverTruckTrailerDto.getTrailer_id()
+                        && x.getUser_id() == userTruck.getUser().getUser_id()).findFirst().get();
 
 
         userTruckDBService.deleteUserTruck(userTruck.getUser_truck_id());
@@ -255,6 +259,18 @@ public class VehicleController {
 
 
         return ResponseEntity.ok("Rozłączono");
+    }
+
+    @GetMapping("/getUnbindedDrivers")
+    public ResponseEntity<List<User>> getDrivers(@RequestHeader("Authorization") String authorizationHeader) {
+        User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+
+        List<User> res = userDBService.getUserByCompany(user.getCompany()).stream().filter(
+                        x -> x.getRole().getRole_name().equals("Kierowca")
+                            && x.getTrucks().isEmpty())
+                .collect(Collectors.toList());;
+
+        return ResponseEntity.ok(res);
     }
 
 

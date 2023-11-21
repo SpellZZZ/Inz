@@ -5,9 +5,10 @@ import org.example.exceptions.JwtTokenException;
 import org.example.exceptions.ObjectAlreadyExistsException;
 import org.example.exceptions.UserDoesntExistsException;
 import org.example.model.Company;
+import org.example.model.Truck_Trailer;
 import org.example.model.User;
-import org.example.service.dbService.CompanyDBService;
-import org.example.service.dbService.UserDBService;
+import org.example.model.User_Truck;
+import org.example.service.dbService.*;
 import org.example.service.managementService.CompanyManagementService;
 import org.example.service.managementService.UserManagementService;
 import org.example.util.JwtTokenUtil;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController("/company")
 public class CompanyController {
@@ -29,18 +31,30 @@ public class CompanyController {
     private final JwtTokenUtil jwtTokenUtil;
     private final CompanyDBService companyDBService;
     private final CompanyManagementService companyManagementService;
+    private final TruckTrailerDBService truckTrailerDBService;
+    private final UserTruckDBService userTruckDBService;
+    private final TruckDBService truckDBService;
+    private final TrailerDBService trailerDBService;
 
     @Autowired
     public CompanyController(UserManagementService userManagementService,
                              UserDBService userDBService,
                              JwtTokenUtil jwtTokenUtil,
                              CompanyDBService companyDBService,
-                             CompanyManagementService companyManagementService) {
+                             CompanyManagementService companyManagementService,
+                             TruckDBService truckDBService,
+                             TrailerDBService trailerDBService,
+                             TruckTrailerDBService truckTrailerDBService,
+                             UserTruckDBService userTruckDBService) {
         this.userManagementService = userManagementService;
         this.userDBService = userDBService;
         this.jwtTokenUtil = jwtTokenUtil;
         this.companyDBService = companyDBService;
         this.companyManagementService = companyManagementService;
+        this.truckTrailerDBService = truckTrailerDBService;
+        this.userTruckDBService = userTruckDBService;
+        this.truckDBService = truckDBService;
+        this.trailerDBService = trailerDBService;
     }
 
 
@@ -150,6 +164,50 @@ public class CompanyController {
                                         dto.setRole(x.getRole().getRole_name());
                                         return dto;})
                     .toList();
+
+
+        return ResponseEntity.ok(res);
+    }
+
+    @GetMapping("/companyGetBindedDrivers")
+    public ResponseEntity<List<BindedDriversDto>> companyGetBindedDrivers(@RequestHeader("Authorization") String authorizationHeader) {
+        User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+
+
+
+        List<User> users = userDBService.getUserByCompany(user.getCompany()).stream().filter(
+                        x -> x.getRole().getRole_name().equals("Kierowca")
+                                && x.getTrucks().size() > 0 )
+                .collect(Collectors.toList());
+
+
+
+
+       List<BindedDriversDto> res = users
+                .stream().map(x -> {BindedDriversDto dto = new BindedDriversDto();
+                    dto.setUser_id(x.getUser_id());
+                    dto.setTruck_id(userTruckDBService.getUserTrucks().stream()
+                            .filter(y->
+                                    y.getUser().getUser_id()==x.getUser_id()).findFirst().get().getTruck().getTruck_id());
+                    dto.setTrailer_id(truckTrailerDBService.getTruckTrailers().stream()
+                            .filter(y ->
+                                    y.getUser_id() == x.getUser_id()).findFirst().get().getTrailer().getTrailer_id());
+
+                   dto.setTruckModel(truckDBService.getTruck(dto.getTruck_id()).getModel());
+                   dto.setTruckReg(truckDBService.getTruck(dto.getTruck_id()).getRegistration_number());
+                    dto.setUserName(x.getName());
+                    dto.setUserSurname(x.getSurname());
+
+                    dto.setTrailerDesc(trailerDBService.getTrailer(dto.getTrailer_id()).getDescription());
+                    dto.setToString(dto.getUserName() + " " +
+                                    dto.getUserSurname() + " " +
+                                    dto.getTruckModel() + " " +
+                                    dto.getTruckReg() + " " +
+                                    dto.getTrailerDesc());
+
+
+                    return dto;})
+                .toList();
 
 
         return ResponseEntity.ok(res);

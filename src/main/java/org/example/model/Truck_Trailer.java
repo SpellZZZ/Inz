@@ -23,6 +23,7 @@ public class Truck_Trailer {
 
     private Date time_start;
     private Date time_end;
+    private int user_id;
 
 
 

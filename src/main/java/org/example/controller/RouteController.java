@@ -64,6 +64,8 @@ public class RouteController {
                                                      @RequestHeader("Authorization") String authorizationHeader) {
 
         try {
+
+
             Route route = new Route();
             route.setUser(userDBService.getUser(routeAddDto.getUser_id()));
             route.setTruck(truckDBService.getTruck(routeAddDto.getTruck_id()));
