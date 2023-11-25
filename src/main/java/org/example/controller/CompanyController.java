@@ -65,6 +65,9 @@ public class CompanyController {
                                              @RequestHeader("Authorization") String authorizationHeader) {
 
         try {
+            System.out.println(companyFormDto.getCompany_name());
+            System.out.println(companyFormDto.getCompany_nip());
+
             validateCompanyNotExists(companyFormDto);
             Company company = createCompanyFromDto(companyFormDto, authorizationHeader);
             companyDBService.saveCompany(company);

@@ -49,6 +49,11 @@ public class Truck {
 
 
 
+    @ManyToMany(mappedBy = "routeTrucks")
+    private Set<Route> routeTrucks = new HashSet<>();
+
+
+
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "Truck_Trailer",
             joinColumns = @JoinColumn(name = "truck_id"),

@@ -40,6 +40,7 @@ public class RouteController {
     private final RouteAddressDBService routeAddressDBService;
     private final AddressDBService addressDBService;
     private final CommissionDBService commissionDBService;
+    private final RouteTruckDBService routeTruckDBService;
 
 
     @Autowired
@@ -55,7 +56,8 @@ public class RouteController {
                            RouteDBService routeDBService,
                            RouteAddressDBService routeAddressDBService,
                            AddressDBService addressDBService,
-                           CommissionDBService commissionDBService) {
+                           CommissionDBService commissionDBService,
+                           RouteTruckDBService routeTruckDBService) {
         this.userManagementService = userManagementService;
         this.userDBService = userDBService;
         this.jwtTokenUtil = jwtTokenUtil;
@@ -69,6 +71,7 @@ public class RouteController {
         this.routeAddressDBService = routeAddressDBService;
         this.addressDBService = addressDBService;
         this.commissionDBService = commissionDBService;
+        this.routeTruckDBService = routeTruckDBService;
     }
 
 
@@ -97,8 +100,29 @@ public class RouteController {
 
             Truck truck = truckDBService.getTruck(Integer.parseInt(routeAddDto.getDriver()));
 
+            Route route = new Route();
+            route.setName(routeAddDto.getName());
+            route.setDate_start(Date.valueOf(routeAddDto.getDate()));
+            route.getAddresses().add(address);
+            //route.setTruck(truck);
+            route.setCompany(user.getCompany());
+            //route.setUser(u);
+            route.setStatus(false);
+            routeDBService.saveRoute(route);
 
-            for(User u : truck.getUsers()){
+            for(User u : truck.getUsers()) {
+                Route_Truck routeTruck = new Route_Truck();
+                routeTruck.setTruck_id(truck);
+                routeTruck.setUser_id(u);
+                routeTruck.setTrailer_id(truck.getTrailers().stream().findFirst().get());
+                routeTruck.setRoute_id(route);
+
+                routeTruckDBService.saveRouteTruck(routeTruck);
+            }
+
+
+            /*for(User u : truck.getUsers()){
+
                 Route route = new Route();
                 route.setName(routeAddDto.getName());
                 route.setDate_start(Date.valueOf(routeAddDto.getDate()));
@@ -108,7 +132,7 @@ public class RouteController {
                 route.setUser(u);
                 route.setStatus(false);
                 routeDBService.saveRoute(route);
-            }
+            }*/
 
 
 

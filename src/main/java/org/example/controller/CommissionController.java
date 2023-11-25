@@ -66,26 +66,28 @@ public class CommissionController {
             Address addressStart = new Address();
             Address addressEnd = new Address();
 
-            addressStart.setAddress(commissionDto.getAddressStart());
-            addressStart.setGPS_X(commissionDto.getGPS_XStart());
-            addressStart.setGPS_Y(commissionDto.getGPS_YStart());
-            addressStart.setHouse_number(commissionDto.getHouse_numberStart());
-            addressStart.setZip_code(commissionDto.getZip_codeStart());
+            addressStart.setAddress(commissionDto.getAddressstart());
+            addressStart.setGPS_X(commissionDto.getGps_xstart());
+            addressStart.setGPS_Y(commissionDto.getGps_ystart());
+            addressStart.setHouse_number(commissionDto.getHouse_numberstart());
+            addressStart.setZip_code(commissionDto.getZip_codestart());
+            addressStart.setCity(commissionDto.getCitystart());
             addressDBService.saveAddress(addressStart);
 
-            addressEnd.setAddress(commissionDto.getAddressEnd());
-            addressEnd.setGPS_X(commissionDto.getGPS_XEnd());
-            addressEnd.setGPS_Y(commissionDto.getGPS_YEnd());
-            addressEnd.setHouse_number(commissionDto.getHouse_numberEnd());
-            addressEnd.setZip_code(commissionDto.getZip_codeEnd());
+            addressEnd.setAddress(commissionDto.getAddressend());
+            addressEnd.setGPS_X(commissionDto.getGps_xend());
+            addressEnd.setGPS_Y(commissionDto.getGps_yend());
+            addressEnd.setHouse_number(commissionDto.getHouse_numberend());
+            addressEnd.setZip_code(commissionDto.getZip_codeend());
+            addressEnd.setCity(commissionDto.getCityend());
             addressDBService.saveAddress(addressEnd);
 
             commission.setDelivery_pickup(addressStart);
             commission.setDelivery_endpoint(addressEnd);
             commission.setDescription(commissionDto.getDescription());
-            commission.setX(commissionDto.getXPackage());
-            commission.setY(commissionDto.getYPackage());
-            commission.setZ(commissionDto.getZPackage());
+            commission.setX(commissionDto.getXpackage());
+            commission.setY(commissionDto.getYpackage());
+            commission.setZ(commissionDto.getZpackage());
             commission.setMass(commissionDto.getMass());
             commission.setStackable(commissionDto.getStackable());
             commission.setCount(commissionDto.getCount());
@@ -103,9 +105,9 @@ public class CommissionController {
             System.out.println(commissionDto.getGPS_XEnd());
             System.out.println(commissionDto.getGPS_YEnd());*/
 
-            System.out.println(commissionDto.getXPackage());
-            System.out.println(commissionDto.getYPackage());
-            System.out.println(commissionDto.getZPackage());
+            System.out.println(commissionDto.getXpackage());
+            System.out.println(commissionDto.getYpackage());
+            System.out.println(commissionDto.getZpackage());
             System.out.println(commissionDto.getMass());
 
 
