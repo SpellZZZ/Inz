@@ -17,10 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController("/route")
@@ -98,15 +96,26 @@ public class RouteController {
             addressDBService.saveAddress(address);
 
 
+            Address addressEnd = new Address();
+            addressEnd.setAddress(routeAddDto.getAddressEnd());
+            addressEnd.setCity(routeAddDto.getCityEnd());
+            addressEnd.setHouse_number(routeAddDto.getHouseNumberEnd());
+            addressEnd.setGPS_X(Double.valueOf(routeAddDto.getGpsXEnd()));
+            addressEnd.setGPS_Y(Double.valueOf(routeAddDto.getGpsYEnd()));
+            addressEnd.setZip_code(routeAddDto.getZipCodeEnd());
+            addressDBService.saveAddress(addressEnd);
+
             Truck truck = truckDBService.getTruck(Integer.parseInt(routeAddDto.getDriver()));
+
 
             Route route = new Route();
             route.setName(routeAddDto.getName());
             route.setDate_start(Date.valueOf(routeAddDto.getDate()));
-            route.getAddresses().add(address);
-            //route.setTruck(truck);
+            //route.getAddresses().add(address);
+            //route.getAddresses();
+            route.setTruck(truck);
             route.setCompany(user.getCompany());
-            //route.setUser(u);
+            route.setUser(userDBService.getUser(Integer.valueOf(routeAddDto.getDriver())));
             route.setStatus(false);
             routeDBService.saveRoute(route);
 
@@ -119,6 +128,19 @@ public class RouteController {
 
                 routeTruckDBService.saveRouteTruck(routeTruck);
             }
+
+
+            Route_Address routeAddressStart = new Route_Address();
+            routeAddressStart.setAddress(address);
+            routeAddressStart.setRoute(route);
+            routeAddressStart.setPoint_number(0);
+            routeAddressDBService.saveRouteAddress(routeAddressStart);
+
+            Route_Address routeAddressEnd = new Route_Address();
+            routeAddressEnd.setAddress(addressEnd);
+            routeAddressEnd.setRoute(route);
+            routeAddressEnd.setPoint_number(1);
+            routeAddressDBService.saveRouteAddress(routeAddressEnd);
 
 
             /*for(User u : truck.getUsers()){
@@ -151,6 +173,7 @@ public class RouteController {
         }
     }
 
+
     @GetMapping("/getRoutes")
     public ResponseEntity<List<RouteDto>> getRoutes(@RequestHeader("Authorization") String authorizationHeader) {
         User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
@@ -181,10 +204,31 @@ public class RouteController {
     }
 
 
+    @GetMapping("/getRoute/{id}")
+    public ResponseEntity<RouteDetailsDto> getRoute(@PathVariable int id, @RequestHeader("Authorization") String authorizationHeader) {
+        User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+
+        Route route = routeDBService.getRouteByCompany(user.getCompany()).stream().filter(
+               x -> x.getRoute_id() == id
+        ).findFirst().get();
+
+        RouteDetailsDto routeDetailsDto = new RouteDetailsDto();
+
+        routeDetailsDto.setRoute(route);
+        //routeDetailsDto.setAddressStart();
+        routeDetailsDto.setCommissions(commissionDBService.getCommissionByRoute(route));
+
+
+
+        return ResponseEntity.ok(routeDetailsDto);
+    }
+
+
     @GetMapping("/endRoute")
     public ResponseEntity<Object> endRoute(@RequestHeader("Authorization") String authorizationHeader, @RequestParam int id) {
         User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
         Route route = routeDBService.getRoute(id);
+        route.setDate_end(Date.valueOf(LocalDate.now()));
         route.setStatus(true);
         routeDBService.saveRoute(route);
 
@@ -196,14 +240,27 @@ public class RouteController {
     @GetMapping("/getRouteData")
     public ResponseEntity<RouteDataDto> getRouteDate(@RequestHeader("Authorization") String authorizationHeader) {
         User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+
         List<Route> routes = routeDBService.getRouteByUser(user);
-        Route route = routes.stream().filter(x ->
-                !x.isStatus()).findFirst().get();
+
+        Route route;
+        Optional<Route> routeOptional = routes.stream().filter(x ->
+                !x.isStatus()).findFirst();
+
+
+        if (routeOptional.isPresent()) {
+            route = routeOptional.get();
+
+        } else {
+            return ResponseEntity.ok(null);
+        }
 
         RouteDataDto routeDto = new RouteDataDto();
 
         routeDto.setDate(route.getDate_start().toString());
         routeDto.setDriver(user.getName() + " " + user.getSurname());
+
+
         routeDto.setCity(route.getAddresses().stream().toList().get(0).getCity());
         routeDto.setGpsX(route.getAddresses().stream().toList().get(0).getGPS_X());
 
@@ -212,8 +269,16 @@ public class RouteController {
         routeDto.setZipCode(route.getAddresses().stream().toList().get(0).getZip_code());
         routeDto.setAddress(route.getAddresses().stream().toList().get(0).getAddress());
 
+        routeDto.setCityEnd(route.getAddresses().stream().toList().get(1).getCity());
+        routeDto.setGpsXEnd(route.getAddresses().stream().toList().get(1).getGPS_X());
+
+        routeDto.setGpsYEnd(route.getAddresses().stream().toList().get(1).getGPS_Y());
+        routeDto.setHouseNumberEnd(route.getAddresses().stream().toList().get(1).getHouse_number());
+        routeDto.setZipCodeEnd(route.getAddresses().stream().toList().get(1).getZip_code());
+        routeDto.setAddressEnd(route.getAddresses().stream().toList().get(1).getAddress());
+
         routeDto.setTruckReg(route.getTruck().getRegistration_number());
-        routeDto.setTruckReg(route.getTruck().getModel());
+        routeDto.setTruckModel(route.getTruck().getModel());
         routeDto.setTrailerDesc(route.getTruck().getTrailers().stream().findFirst().get().getDescription());
         routeDto.setRoute_id(route.getRoute_id());
         routeDto.setName(route.getName());
@@ -236,33 +301,28 @@ public class RouteController {
         return ResponseEntity.ok(routeDto);
     }
 
-    /*@PostMapping("/endRoute")
-    public ResponseEntity<Object> endRoute(@RequestParam int id,
-                                                     @RequestHeader("Authorization") String authorizationHeader) {
+    @GetMapping("/routeHistory")
+    public ResponseEntity<List<RouteHistoryDto>> endRoute(@RequestHeader("Authorization") String authorizationHeader) {
+        User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+        List<Route> route = routeDBService.getRouteByUser(user);
+        List<Route_Truck> routeTrucks = routeTruckDBService.getRouteTruckByUser(user);
 
-        try {
-            Route route = new Route();
-            route.setUser(userDBService.getUser(routeAddDto.getUser_id()));
-            route.setTruck(truckDBService.getTruck(routeAddDto.getTruck_id()));
-            route.setDate_start(Date.valueOf(routeAddDto.getDate_start()));
-            route.setDate_end(Date.valueOf(routeAddDto.getDate_end()));
-            routeDBService.getRoute(id).set;
+        List<Route_Truck> resF = routeTrucks.stream().filter(x->
+                x.getRoute_id().isStatus()).toList();
+
+        List<RouteHistoryDto> res = resF.stream().map(x->{
+            RouteHistoryDto dto = new RouteHistoryDto();
+            dto.setId(x.getId());
+            dto.setTruck(x.getTruck_id().getModel());
+            dto.setData_start(x.getRoute_id().getDate_start().toString());
+            dto.setData_end(x.getRoute_id().getDate_end().toString());
+            return dto;
+        }).toList();
 
 
-            return ResponseHelper.createSuccessResponse("Trasa zapisana");
 
-
-        } catch (JwtTokenException ex) {
-            return ResponseHelper.createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
-        } catch (ObjectAlreadyExistsException ex) {
-            return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
-        } catch (UserDoesntExistsException ex) {
-            return ResponseHelper.createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
-        }
-        catch (Exception ex) {
-            return ResponseHelper.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Wystąpił błąd");
-        }
-    }*/
+        return ResponseEntity.ok(res);
+    }
 
 
 

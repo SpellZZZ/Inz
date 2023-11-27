@@ -1,5 +1,6 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,17 +23,21 @@ public class Route_Truck {
 
     @ManyToOne
     @JoinColumn(name = "truck_id")
+    @JsonBackReference
     private Truck truck_id;
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user_id;
 
     @ManyToOne
     @JoinColumn(name = "route_id")
+    @JsonBackReference
     private Route route_id;
 
     @ManyToOne
     @JoinColumn(name = "trailer_id")
+    @JsonBackReference
     private Trailer trailer_id;
 
 

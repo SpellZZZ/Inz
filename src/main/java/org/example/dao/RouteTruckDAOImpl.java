@@ -1,9 +1,9 @@
 package org.example.dao;
 
-import org.example.model.Route_Address;
-import org.example.model.Route_Truck;
+import org.example.model.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -47,5 +47,16 @@ public class RouteTruckDAOImpl implements RouteTruckDAO{
     public void updateRouteTruck(Route_Truck routeTruck) {
         Session currentSession = sessionFactory.getCurrentSession();
         currentSession.update(routeTruck);
+    }
+
+    @Override
+    public List<Route_Truck> getRouteTruckByUser(User user) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        String hql = "FROM Route_Truck t WHERE t.user_id = :user_id";
+        Query<Route_Truck> query = currentSession.createQuery(hql, Route_Truck.class);
+        query.setParameter("user_id", user);
+        List<Route_Truck> routeTrucks = query.getResultList();
+        return routeTrucks;
     }
 }

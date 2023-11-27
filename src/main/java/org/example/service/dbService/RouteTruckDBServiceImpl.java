@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.example.dao.RouteDAO;
 import org.example.dao.RouteTruckDAO;
 import org.example.model.Route_Truck;
+import org.example.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,5 +48,11 @@ public class RouteTruckDBServiceImpl implements RouteTruckDBService{
     @Transactional
     public void updateRouteTruck(Route_Truck routeTruck) {
         routeTruckDAO.updateRouteTruck(routeTruck);
+    }
+
+    @Override
+    @Transactional
+    public List<Route_Truck> getRouteTruckByUser(User user) {
+        return routeTruckDAO.getRouteTruckByUser(user);
     }
 }

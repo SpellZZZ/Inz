@@ -183,5 +183,14 @@ public class CommissionController {
 
     }
 
+    @GetMapping("/getUserCommission/{id}")
+    public ResponseEntity<Commission> getUserCommission(@RequestHeader("Authorization") String authorizationHeader,@PathVariable  int id) {
+        User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+        List<Commission> resArray = commissionDBService.getCommissionByUser(user);
+        Commission res = resArray.stream().filter(x -> x.getCommission_id() == id).findFirst().get();
+
+        return ResponseEntity.ok(res);
+    }
+
 
 }

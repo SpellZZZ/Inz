@@ -2,6 +2,7 @@ package org.example.dao;
 
 import org.example.model.Route_Truck;
 import org.example.model.Truck_Trailer;
+import org.example.model.User;
 
 import java.util.List;
 
@@ -17,4 +18,5 @@ public interface RouteTruckDAO {
     void updateRouteTruck(Route_Truck routeTruck);
 
 
+    List<Route_Truck> getRouteTruckByUser(User user);
 }

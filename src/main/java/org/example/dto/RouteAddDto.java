@@ -18,12 +18,20 @@ public class RouteAddDto implements Serializable {
     private String gpsY;
     private String address;
     private String city;
+
+
+    private String nameEnd;
+    private String zipCodeEnd;
+    private String houseNumberEnd;
+    private String gpsXEnd;
+    private String gpsYEnd;
+    private String addressEnd;
+    private String cityEnd;
+
     private String driver;
     private String description;
 
-
-    public RouteAddDto(String date, String name, String zipCode, String houseNumber, String gpsX, String gpsY, String address, String city, String driver, String description) {
-
+    public RouteAddDto(String date, String name, String zipCode, String houseNumber, String gpsX, String gpsY, String address, String city, String nameEnd, String zipCodeEnd, String houseNumberEnd, String gpsXEnd, String gpsYEnd, String addressEnd, String cityEnd, String driver, String description) {
         this.date = date;
         this.name = name;
         this.zipCode = zipCode;
@@ -32,6 +40,13 @@ public class RouteAddDto implements Serializable {
         this.gpsY = gpsY;
         this.address = address;
         this.city = city;
+        this.nameEnd = nameEnd;
+        this.zipCodeEnd = zipCodeEnd;
+        this.houseNumberEnd = houseNumberEnd;
+        this.gpsXEnd = gpsXEnd;
+        this.gpsYEnd = gpsYEnd;
+        this.addressEnd = addressEnd;
+        this.cityEnd = cityEnd;
         this.driver = driver;
         this.description = description;
     }

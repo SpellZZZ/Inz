@@ -28,6 +28,16 @@ import java.util.List;
         private double gpsY;
         private String address;
         private String city;
+
+
+        private String dateEnd;
+        private String zipCodeEnd;
+        private String houseNumberEnd;
+        private double gpsXEnd;
+        private double gpsYEnd;
+        private String addressEnd;
+        private String cityEnd;
+
         private String driver;
         private String description;
 
