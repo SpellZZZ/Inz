@@ -6,10 +6,12 @@ import org.example.dto.RegisterFormDto;
 import org.example.dto.UserUpdateDto;
 import org.example.exceptions.JwtTokenException;
 import org.example.exceptions.ObjectAlreadyExistsException;
+import org.example.model.Commission;
 import org.example.model.Role;
 import org.example.model.Trailer;
 import org.example.model.User;
 import org.example.service.JwtAuthService;
+import org.example.service.dbService.CommissionDBService;
 import org.example.service.dbService.UserDBService;
 import org.example.service.managementService.UserManagementService;
 import org.example.util.JwtTokenUtil;
@@ -30,16 +32,19 @@ public class UserController {
     private final UserDBService userDBService;
     private final JwtTokenUtil jwtTokenUtil;
     private final JwtAuthService jwtAuthService;
+    private final CommissionDBService commissionDBService;
 
     @Autowired
     public UserController(UserManagementService userManagementService,
                           UserDBService userDBService,
                           JwtTokenUtil jwtTokenUtil,
-                          JwtAuthService jwtAuthService) {
+                          JwtAuthService jwtAuthService,
+                          CommissionDBService commissionDBService) {
         this.userManagementService = userManagementService;
         this.userDBService = userDBService;
         this.jwtTokenUtil = jwtTokenUtil;
         this.jwtAuthService = jwtAuthService;
+        this.commissionDBService = commissionDBService;
     }
 
     @GetMapping("/allUsers")
@@ -52,7 +57,8 @@ public class UserController {
         jwtAuthService.authenticate(authenticationRequest.getLoginUsername(), authenticationRequest.getLoginPassword());
         final String token = jwtTokenUtil.generateToken(authenticationRequest.getLoginUsername());
         final String role = userManagementService.getUserRole(authenticationRequest.getLoginUsername());
-        return ResponseEntity.ok(new AuthenticateResponseDto(token, role));
+        final boolean status = userDBService.getUserByUserName(authenticationRequest.getLoginUsername()).getDeleted();
+        return ResponseEntity.ok(new AuthenticateResponseDto(token, role, status));
     }
 
     @PostMapping("/userRegister")
@@ -131,6 +137,24 @@ public class UserController {
     }
 
 
+    @PostMapping("/deactivateAccount")
+    public ResponseEntity<Object> deactivateAccount(@RequestHeader("Authorization") String authorizationHeader) {
+        User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+
+
+        for(Commission c : commissionDBService.getCommissionByUser(user)){
+            if( c.getCanceled() == 0 ){
+                if(!(c.getIs_loaded() && c.getIs_unloaded())) return ResponseHelper.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,"Wystąpił błąd");
+            }
+        }
+
+        user.setDeleted(true);
+        userDBService.saveUser(user);
+
+        return ResponseHelper.createSuccessResponse("Sukces");
+
+
+    }
 
 
 
