@@ -14,7 +14,7 @@ public interface CompanyManagementService {
 
     void addNewUser(CompanyAddUserDto companyAddUserDto, String authorizationHeader) throws Exception;
 
-    void setUserRole(CompanyUserSetRoleDto companyUserSetRoleDto, String authorizationHeader);
+    void setUserRole(CompanyUserSetRoleDto companyUserSetRoleDto, String authorizationHeader) throws Exception;
 
-    void delete(CompanyAddUserDto companyAddUserDto, String authorizationHeader);
+    void delete(CompanyAddUserDto companyAddUserDto, String authorizationHeader) throws Exception;
 }

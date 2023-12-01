@@ -5,15 +5,15 @@ import org.example.dto.CompanyAddUserDto;
 import org.example.dto.CompanyFormDto;
 import org.example.dto.CompanyUserSetRoleDto;
 import org.example.exceptions.UserDoesntExistsException;
-import org.example.model.Company;
-import org.example.model.Role;
-import org.example.model.User;
+import org.example.model.*;
 import org.example.service.JwtAuthService;
-import org.example.service.dbService.CompanyDBService;
-import org.example.service.dbService.RoleDBService;
-import org.example.service.dbService.UserDBService;
+import org.example.service.dbService.*;
+import org.example.util.ResponseHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CompanyManagementServiceImpl implements CompanyManagementService {
@@ -23,19 +23,23 @@ public class CompanyManagementServiceImpl implements CompanyManagementService {
     private final UserManagementService userManagementService;
     private final RoleDBService roleDBService;
     private final UserDBService userDBService;
+    private final UserTruckDBService userTruckDBService;
 
     @Autowired
     public CompanyManagementServiceImpl(CompanyDBService companyDBService,
                                         JwtAuthService jwtAuthService,
                                         UserManagementService userManagementService,
                                         RoleDBService roleDBService,
-                                        UserDBService userDBService
+                                        UserDBService userDBService,
+                                        RouteTruckDBService routeTruckDBService,
+                                        UserTruckDBService userTruckDBService
     ) {
         this.companyDBService = companyDBService;
         this.jwtAuthService = jwtAuthService;
         this.userManagementService = userManagementService;
         this.roleDBService = roleDBService;
         this.userDBService = userDBService;
+        this.userTruckDBService = userTruckDBService;
     }
     @Override
     public void setOwner(Company company, String authorizationHeader) {
@@ -89,17 +93,47 @@ public class CompanyManagementServiceImpl implements CompanyManagementService {
     }
 
     @Override
-    public void setUserRole(CompanyUserSetRoleDto companyUserSetRoleDto, String authorizationHeader) {
+    public void setUserRole(CompanyUserSetRoleDto companyUserSetRoleDto, String authorizationHeader) throws Exception {
         User user = userDBService.getUserByUserName(companyUserSetRoleDto.getLogin());
+
+        if(user.getRole().getRole_name().equals("Kierowca")){
+            List<User_Truck> userTrucksList = userTruckDBService.getUserTrucks();
+
+            for(User_Truck x : userTrucksList) {
+                if(x.getUser().getUser_id() == user.getUser_id()){
+                    throw new Exception("Użytkownik ma przypisana ciezarowke");
+                }
+
+            }
+
+
+
+        }
+
         Role role = roleDBService.getRoleByName(companyUserSetRoleDto.getRole());
+
         user.setRole(role);
         userDBService.userUpdate(user);
 
     }
 
     @Override
-    public void delete(CompanyAddUserDto companyAddUserDto, String authorizationHeader) {
+    public void delete(CompanyAddUserDto companyAddUserDto, String authorizationHeader) throws Exception{
         User user = userDBService.getUserByUserName(companyAddUserDto.getLogin());
+
+        if(user.getRole().getRole_name().equals("Kierowca")){
+            List<User_Truck> userTrucksList = userTruckDBService.getUserTrucks();
+
+            for(User_Truck x : userTrucksList) {
+                if(x.getUser().getUser_id() == user.getUser_id()){
+                    throw new Exception("Użytkownik ma przypisana ciezarowke");
+                }
+
+            }
+
+        }
+
+
         Role role = roleDBService.getRoleByName("Uzytkownik");
         user.setRole(role);
         user.setCompany(null);
