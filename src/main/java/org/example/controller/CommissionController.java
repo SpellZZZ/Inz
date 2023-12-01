@@ -96,6 +96,7 @@ public class CommissionController {
             commission.setDate_of_placement(Date.valueOf(LocalDate.now()));
             commission.setIs_loaded(false);
             commission.setIs_unloaded(false);
+            commission.setIs_selected(false);
 
             commissionDBService.saveCommission(commission);
 
@@ -138,7 +139,7 @@ public class CommissionController {
     public ResponseEntity<List<Commission>> getCommissions(@RequestHeader("Authorization") String authorizationHeader) {
         List<Commission> commissions = commissionDBService.getCommissions();
         List<Commission> res = commissions.stream().filter(x ->
-                                x.getRoute() == null).toList();
+                                x.getRoute() == null && x.getCanceled() == 0).toList();
 
 
 
@@ -147,7 +148,7 @@ public class CommissionController {
 
     @PostMapping("/addCommissionToRoute")
     public ResponseEntity<Object> addCommissionToRoute(@RequestHeader("Authorization") String authorizationHeader,
-                                            @RequestBody AddCommissionToRouteDto addCommissionToRouteDto) {
+                                                       @RequestBody AddCommissionToRouteDto addCommissionToRouteDto) {
 
 
         Route route = routeDBService.getRoute(Integer.valueOf(addCommissionToRouteDto.getRoute_id()));
@@ -155,11 +156,13 @@ public class CommissionController {
         for(int i = 0 ; i < addCommissionToRouteDto.getPackages().size(); i++){
             Commission c = commissionDBService.getCommission(addCommissionToRouteDto.getPackages().get(i));
             c.setRoute(route);
+            c.setIs_selected(true);
             commissionDBService.updateCommission(c);
         }
 
         return ResponseHelper.createSuccessResponse("Dodano paczki do przejazdu");
     }
+
 
 
     @PostMapping("/commissionLoaded")
@@ -190,6 +193,24 @@ public class CommissionController {
         Commission res = resArray.stream().filter(x -> x.getCommission_id() == id).findFirst().get();
 
         return ResponseEntity.ok(res);
+    }
+
+    @PostMapping("/cancelCommission/{id}")
+    public ResponseEntity<Object> cancelCommission(@RequestHeader("Authorization") String authorizationHeader,@PathVariable  int id) {
+
+
+        Commission commission = commissionDBService.getCommission(id);
+        if(commission.getRoute() != null){
+
+            return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT,"Nie udalo sie zmienic status paczki");
+
+        }
+        if (commission.getCanceled() == 0) commission.setCanceled(1);
+        else commission.setCanceled(0);
+
+        commissionDBService.saveCommission(commission);
+
+        return ResponseHelper.createSuccessResponse("Zmieniono status paczki");
     }
 
 
