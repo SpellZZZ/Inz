@@ -37,7 +37,7 @@ public class VehicleController {
     private final TruckTrailerDBService truckTrailerDBService;
     private final UserTruckDBService userTruckDBService;
     private final RouteDBService routeDBService;
-
+    private final RouteTruckDBService routeTruckDBService;
 
     @Autowired
     public VehicleController(UserManagementService userManagementService,
@@ -49,7 +49,8 @@ public class VehicleController {
                              TrailerDBService trailerDBService,
                              TruckTrailerDBService truckTrailerDBService,
                              UserTruckDBService userTruckDBService,
-                             RouteDBService routeDBService) {
+                             RouteDBService routeDBService,
+                             RouteTruckDBService routeTruckDBService) {
         this.userManagementService = userManagementService;
         this.userDBService = userDBService;
         this.jwtTokenUtil = jwtTokenUtil;
@@ -60,6 +61,7 @@ public class VehicleController {
         this.truckTrailerDBService = truckTrailerDBService;
         this.userTruckDBService = userTruckDBService;
         this.routeDBService = routeDBService;
+        this.routeTruckDBService = routeTruckDBService;
     }
 
 
@@ -241,6 +243,15 @@ public class VehicleController {
         //User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
 
         //List<User> users = userDBService.getUserByCompany(user.getCompany());
+
+        List<Route_Truck> routeTrucks = routeTruckDBService.getRouteTruckByUser(userDBService.getUser(bindDriverTruckTrailerDto.getUser_id()));
+
+
+        for(Route_Truck x : routeTrucks) {
+            if(!x.getRoute_id().isStatus())
+                return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, "Ten kierowca ma niezakończoną trasę");
+         }
+
 
 
         User_Truck userTruck = userTruckDBService.getUserTrucks().stream()

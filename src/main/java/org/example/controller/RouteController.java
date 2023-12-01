@@ -115,7 +115,7 @@ public class RouteController {
             //route.getAddresses();
             route.setTruck(truck);
             route.setCompany(user.getCompany());
-            route.setUser(userDBService.getUser(Integer.valueOf(routeAddDto.getDriver())));
+            route.setUser(/*userDBService.getUser(Integer.valueOf(routeAddDto.getDriver()))*/null);
             route.setStatus(false);
             routeDBService.saveRoute(route);
 
