@@ -220,18 +220,18 @@ public class VehicleController {
         Truck truck = truckDBService.getTruck(bindDriverTruckTrailerDto.getTruck_id());
         Trailer trailer = trailerDBService.getTrailer(bindDriverTruckTrailerDto.getTrailer_id());
 
-        System.out.println(bindDriverTruckTrailerDto.getTruck_id());
-
-        User_Truck userTruck = new User_Truck();
-        userTruck.setTruck(truck);
-        userTruck.setUser(user);
-        userTruckDBService.saveUserTruck(userTruck);
 
         Truck_Trailer truckTrailer = new Truck_Trailer();
         truckTrailer.setTrailer(trailer);
         truckTrailer.setTruck(truck);
         truckTrailer.setUser_id(user.getUser_id());
         truckTrailerDBService.saveTruckTrailer(truckTrailer);
+
+
+        User_Truck userTruck = new User_Truck();
+        userTruck.setTruck(truck);
+        userTruck.setUser(user);
+        userTruckDBService.saveUserTruck(userTruck);
 
         return ResponseEntity.ok("Połączono");
     }

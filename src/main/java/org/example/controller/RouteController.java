@@ -238,10 +238,20 @@ public class RouteController {
 
 
     @GetMapping("/getRouteData")
-    public ResponseEntity<RouteDataDto> getRouteDate(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<RouteDataDto> getRouteData(@RequestHeader("Authorization") String authorizationHeader) {
         User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
 
-        List<Route> routes = routeDBService.getRouteByUser(user);
+        //List<Route> routes = routeDBService.getRouteByUser(user);
+        List<Route_Truck> routeTrucks = routeTruckDBService.getRouteTruckByUser(user);
+
+        List<Route> routes = new ArrayList<>();
+        routeTrucks.forEach(x->routes.add(x.getRoute_id()));
+
+        Collections.sort(routes, new Comparator<Route>() {
+            public int compare(Route o1, Route o2) {
+                return o1.getDate_start().compareTo(o2.getDate_start());
+            }
+        });
 
         Route route;
         Optional<Route> routeOptional = routes.stream().filter(x ->
