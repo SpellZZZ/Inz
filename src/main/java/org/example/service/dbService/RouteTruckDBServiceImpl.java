@@ -3,6 +3,7 @@ package org.example.service.dbService;
 import jakarta.transaction.Transactional;
 import org.example.dao.RouteDAO;
 import org.example.dao.RouteTruckDAO;
+import org.example.model.Route;
 import org.example.model.Route_Truck;
 import org.example.model.Truck;
 import org.example.model.User;
@@ -61,5 +62,11 @@ public class RouteTruckDBServiceImpl implements RouteTruckDBService{
     @Transactional
     public List<Route_Truck> getRouteTruckByTruck(Truck truck) {
         return routeTruckDAO.getRouteTruckByTruck(truck);
+    }
+
+    @Override
+    @Transactional
+    public List<Route_Truck> getRouteTruckByRoute(Route route) {
+        return routeTruckDAO.getRouteTruckByRoute(route);
     }
 }

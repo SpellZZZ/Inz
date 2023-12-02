@@ -1,5 +1,6 @@
 package org.example.service.dbService;
 
+import org.example.model.Route;
 import org.example.model.Route_Truck;
 import org.example.model.Truck;
 import org.example.model.User;
@@ -21,4 +22,6 @@ public interface RouteTruckDBService {
         List<Route_Truck> getRouteTruckByUser(User user);
 
         List<Route_Truck> getRouteTruckByTruck(Truck truck);
+
+        List<Route_Truck> getRouteTruckByRoute(Route route);
 }

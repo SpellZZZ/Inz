@@ -15,5 +15,7 @@ public class RouteDto implements Serializable {
     private String name;
     private String data;
     private String dataEnd;
+    private boolean started;
+    private boolean status;
 
 }

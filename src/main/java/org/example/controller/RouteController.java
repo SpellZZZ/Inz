@@ -190,13 +190,27 @@ public class RouteController {
     public ResponseEntity<List<RouteDto>> getRoutes(@RequestHeader("Authorization") String authorizationHeader) {
         User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
 
+        List<Commission> startedCommission = commissionDBService.getCommissions()
+                .stream().filter(x -> x.getIs_unloaded() || x.getIs_loaded())
+                .toList();
+
+
+
         List<RouteDto> routes = routeDBService.getRouteByCompany(user.getCompany()).stream().map(
                 x -> {
                     RouteDto dto = new RouteDto();
                     dto.setData(x.getDate_start().toString());
                     dto.setDataEnd(x.getDate_end_predict().toString());
+                    dto.setStatus(x.isStatus());
                     dto.setName(x.getName());
                     dto.setId(x.getRoute_id());
+                    dto.setStarted(false);
+
+                    startedCommission.forEach(y ->{
+                        if(y.getRoute().getRoute_id() == x.getRoute_id())
+                                dto.setStarted(true);
+                            });
+
                     return dto;})
                 .toList();
 
@@ -211,10 +225,54 @@ public class RouteController {
         }
 
 
+        Collections.sort(res, new Comparator<RouteDto>() {
+            public int compare(RouteDto o1, RouteDto o2) {
+                return o1.getData().compareTo(o2.getData());
+            }
+        });
+
 
 
         return ResponseEntity.ok(res);
     }
+
+
+    @PostMapping("/deleteRoute")
+    public ResponseEntity<Object> deleteRoute(@RequestBody DeleteRouteDto deleteRouteDto,
+                                             @RequestHeader("Authorization") String authorizationHeader) {
+
+
+        Route route = routeDBService.getRoute(deleteRouteDto.getRoute_id());
+
+        if (commissionDBService.getCommissionByRoute(route).size() >0){
+            return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, "Usun paczki przed usunieciem trasy");
+        }
+
+
+        List<Route_Address> routeAddress = routeAddressDBService.getRouteAddresses();
+
+        List<Route_Address> addressesToDelete =
+                routeAddress.stream().filter(x-> x.getRoute().getRoute_id() == route.getRoute_id()).toList();
+
+
+
+        List<Route_Truck> routeTrucksToDelete = routeTruckDBService.getRouteTruckByRoute(route);
+
+        addressesToDelete.forEach( x->
+                routeAddressDBService.deleteRouteAddress(x.getId())
+        );
+
+        routeTrucksToDelete.forEach( x->
+                routeTruckDBService.deleteRouteTruck(x.getId()));
+
+        routeDBService.deleteRoute(route.getRoute_id());
+
+
+
+        return ResponseEntity.ok("Udało sie usunąć trase");
+    }
+
+
 
 
     @GetMapping("/getRoute/{id}")

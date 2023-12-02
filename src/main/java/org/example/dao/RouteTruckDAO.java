@@ -1,9 +1,6 @@
 package org.example.dao;
 
-import org.example.model.Route_Truck;
-import org.example.model.Truck;
-import org.example.model.Truck_Trailer;
-import org.example.model.User;
+import org.example.model.*;
 
 import java.util.List;
 
@@ -22,4 +19,6 @@ public interface RouteTruckDAO {
     List<Route_Truck> getRouteTruckByUser(User user);
 
     List<Route_Truck> getRouteTruckByTruck(Truck truck);
+
+    List<Route_Truck> getRouteTruckByRoute(Route route);
 }
