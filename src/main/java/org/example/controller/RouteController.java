@@ -194,6 +194,7 @@ public class RouteController {
                 x -> {
                     RouteDto dto = new RouteDto();
                     dto.setData(x.getDate_start().toString());
+                    dto.setDataEnd(x.getDate_end_predict().toString());
                     dto.setName(x.getName());
                     dto.setId(x.getRoute_id());
                     return dto;})
