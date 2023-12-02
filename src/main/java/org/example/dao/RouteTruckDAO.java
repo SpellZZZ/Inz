@@ -1,6 +1,7 @@
 package org.example.dao;
 
 import org.example.model.Route_Truck;
+import org.example.model.Truck;
 import org.example.model.Truck_Trailer;
 import org.example.model.User;
 
@@ -19,4 +20,6 @@ public interface RouteTruckDAO {
 
 
     List<Route_Truck> getRouteTruckByUser(User user);
+
+    List<Route_Truck> getRouteTruckByTruck(Truck truck);
 }

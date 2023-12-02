@@ -36,6 +36,7 @@ public class Commission {
     private Boolean is_unloaded;
     private Boolean is_selected;
     private int canceled;
+    private int point_number;
 
 
 

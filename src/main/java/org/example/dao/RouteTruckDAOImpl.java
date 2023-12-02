@@ -59,4 +59,15 @@ public class RouteTruckDAOImpl implements RouteTruckDAO{
         List<Route_Truck> routeTrucks = query.getResultList();
         return routeTrucks;
     }
+
+    @Override
+    public List<Route_Truck> getRouteTruckByTruck(Truck truck) {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        String hql = "FROM Route_Truck t WHERE t.truck_id = :truck_id";
+        Query<Route_Truck> query = currentSession.createQuery(hql, Route_Truck.class);
+        query.setParameter("truck_id", truck);
+        List<Route_Truck> routeTrucks = query.getResultList();
+        return routeTrucks;
+    }
 }

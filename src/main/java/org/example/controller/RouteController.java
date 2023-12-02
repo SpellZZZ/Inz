@@ -2,6 +2,7 @@ package org.example.controller;
 
 
 import org.example.dto.*;
+import org.example.exceptions.DateErrorException;
 import org.example.exceptions.JwtTokenException;
 import org.example.exceptions.ObjectAlreadyExistsException;
 import org.example.exceptions.UserDoesntExistsException;
@@ -86,6 +87,13 @@ public class RouteController {
                 if(r.getName().equals(routeAddDto.getName())) return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, "taki przejazd istnieje");
             }
 
+            if(!validateDate(routeAddDto.getDate(), routeAddDto.getDatePredict())) throw new DateErrorException("Wystąpił problem z datą");
+
+            Truck truck = truckDBService.getTruck(Integer.parseInt(routeAddDto.getDriver()));
+            if(!validateRoutesDates(routeTruckDBService.getRouteTruckByTruck(truck), routeAddDto.getDate(), routeAddDto.getDatePredict())) throw new DateErrorException("Daty się nakładają");
+
+            routeTruckDBService.getRouteTruckByTruck(truck);
+
             Address address = new Address();
             address.setAddress(routeAddDto.getAddress());
             address.setCity(routeAddDto.getCity());
@@ -105,12 +113,11 @@ public class RouteController {
             addressEnd.setZip_code(routeAddDto.getZipCodeEnd());
             addressDBService.saveAddress(addressEnd);
 
-            Truck truck = truckDBService.getTruck(Integer.parseInt(routeAddDto.getDriver()));
-
 
             Route route = new Route();
             route.setName(routeAddDto.getName());
             route.setDate_start(Date.valueOf(routeAddDto.getDate()));
+            route.setDate_end_predict(Date.valueOf(routeAddDto.getDatePredict()));
             //route.getAddresses().add(address);
             //route.getAddresses();
             route.setTruck(truck);
@@ -165,13 +172,18 @@ public class RouteController {
             return ResponseHelper.createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (ObjectAlreadyExistsException ex) {
             return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
-        } catch (UserDoesntExistsException ex) {
+        } catch (DateErrorException ex){
+            return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+        }
+        catch (UserDoesntExistsException ex) {
             return ResponseHelper.createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
         }
         catch (Exception ex) {
             return ResponseHelper.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Wystąpił błąd");
         }
     }
+
+
 
 
     @GetMapping("/getRoutes")
@@ -332,6 +344,69 @@ public class RouteController {
 
 
         return ResponseEntity.ok(res);
+    }
+
+
+    private boolean validateDate(String dStart, String dEnd){
+
+        Date start = Date.valueOf(dStart);
+        Date end = Date.valueOf(dEnd);
+
+
+        if(start.before(java.sql.Date.valueOf(LocalDate.now()))){
+            return false;
+        }
+
+        if(start.after(end)) return false;
+
+        return true;
+    }
+
+    private boolean validateRoutesDates(List<Route_Truck> routeTruckByTruck, String dStart, String dEnd) {
+
+        Date start = Date.valueOf(dStart);
+        Date end = Date.valueOf(dEnd);
+
+        for(Route_Truck r : routeTruckByTruck){
+
+
+            if(start.before(r.getRoute_id().getDate_start())){
+                if(!end.before(r.getRoute_id().getDate_start()))
+                {
+                    return false;
+                }
+            }
+            if(start.before(r.getRoute_id().getDate_start())){
+                if(end.after(r.getRoute_id().getDate_start()))
+                {
+                    return false;
+                }
+            }
+
+            if(start.after(r.getRoute_id().getDate_end_predict())){
+                if(!end.after(r.getRoute_id().getDate_end_predict()))
+                {
+                    return false;
+                }
+            }
+
+            if(start.before(r.getRoute_id().getDate_end_predict())){
+                if(end.after(r.getRoute_id().getDate_end_predict()))
+                {
+                    return false;
+                }
+            }
+
+            if(start.after(r.getRoute_id().getDate_start())){
+                if(end.before(r.getRoute_id().getDate_end_predict()))
+                {
+                    return false;
+                }
+            }
+
+        }
+
+        return true;
     }
 
 

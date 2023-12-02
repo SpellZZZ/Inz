@@ -1,6 +1,7 @@
 package org.example.service.dbService;
 
 import org.example.model.Route_Truck;
+import org.example.model.Truck;
 import org.example.model.User;
 
 import java.util.List;
@@ -18,4 +19,6 @@ public interface RouteTruckDBService {
         void updateRouteTruck(Route_Truck routeTruck);
 
         List<Route_Truck> getRouteTruckByUser(User user);
+
+        List<Route_Truck> getRouteTruckByTruck(Truck truck);
 }

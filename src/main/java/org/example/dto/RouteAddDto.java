@@ -11,6 +11,7 @@ public class RouteAddDto implements Serializable {
     private static final long serialVersionUID = 5926468583005150707L;
 
     private String date;
+    private String datePredict;
     private String name;
     private String zipCode;
     private String houseNumber;
@@ -31,7 +32,7 @@ public class RouteAddDto implements Serializable {
     private String driver;
     private String description;
 
-    public RouteAddDto(String date, String name, String zipCode, String houseNumber, String gpsX, String gpsY, String address, String city, String nameEnd, String zipCodeEnd, String houseNumberEnd, String gpsXEnd, String gpsYEnd, String addressEnd, String cityEnd, String driver, String description) {
+    public RouteAddDto(String date,String datePredict, String name, String zipCode, String houseNumber, String gpsX, String gpsY, String address, String city, String nameEnd, String zipCodeEnd, String houseNumberEnd, String gpsXEnd, String gpsYEnd, String addressEnd, String cityEnd, String driver, String description) {
         this.date = date;
         this.name = name;
         this.zipCode = zipCode;
@@ -49,6 +50,7 @@ public class RouteAddDto implements Serializable {
         this.cityEnd = cityEnd;
         this.driver = driver;
         this.description = description;
+        this.datePredict = datePredict;
     }
 
     public RouteAddDto() {

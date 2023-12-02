@@ -24,6 +24,7 @@ public class Route {
     private int route_id;
     private Date date_start;
     private Date date_end;
+    private Date date_end_predict;
     private String name;
     private boolean status;
 
