@@ -1,7 +1,6 @@
 package org.example.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,7 +35,8 @@ public class Commission {
     private Boolean is_unloaded;
     private Boolean is_selected;
     private int canceled;
-    private int point_number;
+    private int point_number_start;
+    private int point_number_end;
 
 
 

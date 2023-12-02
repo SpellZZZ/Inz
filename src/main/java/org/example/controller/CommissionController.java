@@ -158,7 +158,8 @@ public class CommissionController {
             Commission c = commissionDBService.getCommission(addCommissionToRouteDto.getPackages().get(i));
             c.setRoute(route);
             c.setIs_selected(true);
-            c.setPoint_number(count++);
+            c.setPoint_number_start(count++);
+            c.setPoint_number_end(count++);
             commissionDBService.updateCommission(c);
         }
 
