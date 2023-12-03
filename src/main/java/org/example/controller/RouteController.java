@@ -284,10 +284,22 @@ public class RouteController {
         ).findFirst().get();
 
         RouteDetailsDto routeDetailsDto = new RouteDetailsDto();
-
         routeDetailsDto.setRoute(route);
-        //routeDetailsDto.setAddressStart();
-        routeDetailsDto.setCommissions(commissionDBService.getCommissionByRoute(route));
+
+        List<Commission> commissionsStart = commissionDBService.getCommissionByRoute(route);
+        Collections.sort(commissionsStart, new Comparator<Commission>() {
+            public int compare(Commission o1, Commission o2) {
+                return Integer.compare(o1.getPoint_number_start(), o2.getPoint_number_start());}
+        });
+
+        List<Commission> commissionsEnd = commissionDBService.getCommissionByRoute(route);
+        Collections.sort(commissionsEnd, new Comparator<Commission>() {
+            public int compare(Commission o1, Commission o2) {
+                return Integer.compare(o1.getPoint_number_end(), o2.getPoint_number_end());}
+        });
+
+        routeDetailsDto.setCommissions(commissionsStart);
+        routeDetailsDto.setCommissions2(commissionsEnd);
 
 
 
@@ -403,6 +415,35 @@ public class RouteController {
 
 
         return ResponseEntity.ok(res);
+    }
+
+
+    @PostMapping("/removeCommission")
+    public ResponseEntity<Object> cancelCommission(@RequestHeader("Authorization") String authorizationHeader,@RequestBody RemoveCommissionDto removeCommissionDto) {
+
+        Route route = routeDBService.getRoute(removeCommissionDto.getRoute_id());
+        Commission commission = commissionDBService.getCommission(removeCommissionDto.getCommission_id());
+
+        int s = commission.getPoint_number_start();
+        int e = commission.getPoint_number_end();
+
+
+        List<Commission> commissionList = commissionDBService.getCommissionByRoute(route);
+
+        for (Commission c: commissionList) {
+            if(s < c.getPoint_number_start())c.setPoint_number_start( c.getPoint_number_start() -1);
+            if(e < c.getPoint_number_end())c.setPoint_number_end( c.getPoint_number_end() -1);
+            commissionDBService.updateCommission(c);
+        }
+
+
+        commission.setIs_selected(null);
+        commission.setPoint_number_start(0);
+        commission.setPoint_number_end(0);
+        commission.setRoute(null);
+        commissionDBService.updateCommission(commission);
+
+        return ResponseHelper.createSuccessResponse("Usunieto paczke z przejazdu");
     }
 
 

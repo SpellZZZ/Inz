@@ -3,6 +3,7 @@ package org.example.controller;
 
 import org.example.dto.AddCommissionToRouteDto;
 import org.example.dto.CommissionDto;
+import org.example.dto.CommissionSwapDto;
 import org.example.exceptions.JwtTokenException;
 import org.example.exceptions.ObjectAlreadyExistsException;
 import org.example.model.Address;
@@ -158,7 +159,7 @@ public class CommissionController {
             Commission c = commissionDBService.getCommission(addCommissionToRouteDto.getPackages().get(i));
             c.setRoute(route);
             c.setIs_selected(true);
-            c.setPoint_number_start(count++);
+            c.setPoint_number_start(count);
             c.setPoint_number_end(count++);
             commissionDBService.updateCommission(c);
         }
@@ -216,5 +217,36 @@ public class CommissionController {
         return ResponseHelper.createSuccessResponse("Zmieniono status paczki");
     }
 
+    @PostMapping("/commissionPickupSwap")
+    public ResponseEntity<Object> commissionPickupSwap(@RequestHeader("Authorization") String authorizationHeader, @RequestBody CommissionSwapDto commissionSwapDto) {
+
+        Commission commissionSt = commissionDBService.getCommission(commissionSwapDto.getFirst());
+        Commission commissionNd = commissionDBService.getCommission(commissionSwapDto.getSecond());
+
+        int i = commissionSt.getPoint_number_start();
+        commissionSt.setPoint_number_start(commissionNd.getPoint_number_start());
+        commissionNd.setPoint_number_start(i);
+
+        commissionDBService.updateCommission(commissionSt);
+        commissionDBService.updateCommission(commissionNd);
+
+        return ResponseHelper.createSuccessResponse("Paczki zamieniono miejscami");
+    }
+
+    @PostMapping("/commissionEndPointSwap")
+    public ResponseEntity<Object> commissionEndPointSwap(@RequestHeader("Authorization") String authorizationHeader, @RequestBody CommissionSwapDto commissionSwapDto) {
+
+        Commission commissionSt = commissionDBService.getCommission(commissionSwapDto.getFirst());
+        Commission commissionNd = commissionDBService.getCommission(commissionSwapDto.getSecond());
+
+        int i = commissionSt.getPoint_number_end();
+        commissionSt.setPoint_number_end(commissionNd.getPoint_number_end());
+        commissionNd.setPoint_number_end(i);
+
+        commissionDBService.updateCommission(commissionSt);
+        commissionDBService.updateCommission(commissionNd);
+
+        return ResponseHelper.createSuccessResponse("Paczki zamieniono miejscami");
+    }
 
 }

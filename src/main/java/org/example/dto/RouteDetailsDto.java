@@ -18,6 +18,7 @@ public class RouteDetailsDto implements Serializable {
     Address addressStart;
     Route route;
     List<Commission>commissions;
+    List<Commission>commissions2;
 
 
 
