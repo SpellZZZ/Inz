@@ -301,6 +301,15 @@ public class RouteController {
         routeDetailsDto.setCommissions(commissionsStart);
         routeDetailsDto.setCommissions2(commissionsEnd);
 
+        Set<Address> routeAddresses = route.getAddresses();
+        Iterator<Address> it = routeAddresses.iterator();
+        Address f = it.next();
+        routeDetailsDto.setAddressStart(f.getZip_code() + " " + f.getCity() + " " + f.getAddress() + " " + f.getHouse_number());
+        f = it.next();
+        routeDetailsDto.setAddressEnd(f.getZip_code() + " " + f.getCity() + " " + f.getAddress() + " " + f.getHouse_number());
+
+
+
 
 
         return ResponseEntity.ok(routeDetailsDto);
@@ -424,6 +433,15 @@ public class RouteController {
         Route route = routeDBService.getRoute(removeCommissionDto.getRoute_id());
         Commission commission = commissionDBService.getCommission(removeCommissionDto.getCommission_id());
 
+
+        List<Commission> commissions = commissionDBService.getCommissionByRoute(route);
+        for(Commission c : commissions) {
+            if(c.getIs_unloaded() || c.getIs_loaded()){
+                return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, "Przejazd ruszyl");
+            }
+        }
+
+
         int s = commission.getPoint_number_start();
         int e = commission.getPoint_number_end();
 
@@ -457,9 +475,7 @@ public class RouteController {
             return false;
         }
 
-        if(start.after(end)) return false;
-
-        return true;
+        return !start.after(end);
     }
 
     private boolean validateRoutesDates(List<Route_Truck> routeTruckByTruck, String dStart, String dEnd) {

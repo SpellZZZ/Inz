@@ -17,14 +17,14 @@ public class TruckDto implements Serializable {
     private  int mass;
     private  String licensePlate;
 
+    private  String brand;
+    private  String description;
+    private  String vin;
+
+
     public TruckDto() {
     }
 
 
-    public TruckDto(String model, int mass, String licensePlate) {
-        this.model = model;
-        this.mass = mass;
-        this.licensePlate = licensePlate;
 
-    }
 }

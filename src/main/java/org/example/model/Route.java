@@ -27,18 +27,21 @@ public class Route {
     private Date date_end_predict;
     private String name;
     private boolean status;
-
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference
     @JoinColumn(name = "truck_id")
     private Truck truck;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonBackReference
+    @JoinTable(name = "Route_Address",
+            joinColumns = @JoinColumn(name = "route_id"),
+            inverseJoinColumns = @JoinColumn(name = "address_id"))
+    private Set<Address> addresses = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "company_id")
     @JsonBackReference
@@ -47,17 +50,9 @@ public class Route {
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonBackReference
-    @JoinTable(name = "Route_Address",
-            joinColumns = @JoinColumn(name = "route_id"),
-            inverseJoinColumns = @JoinColumn(name = "address_id"))
-    private Set<Address> addresses = new HashSet<>();
-
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonBackReference
     @JoinTable(name = "Route_Truck",
             joinColumns = @JoinColumn(name = "route_id"),
             inverseJoinColumns = @JoinColumn(name = "truck_id"))
     private Set<Truck> routeTrucks = new HashSet<>();
-
 
 }

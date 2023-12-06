@@ -91,7 +91,6 @@ public class UserController {
                                              @RequestHeader("Authorization") String authorizationHeader) {
         try {
             User user = updateUserFields(userUpdateDto, authorizationHeader);
-            System.out.println(authorizationHeader);
             userDBService.userUpdate(user);
             return ResponseHelper.createSuccessResponse("Zaktualizowano dane użytkownika");
         } catch (JwtTokenException ex) {

@@ -29,6 +29,7 @@ public class Trailer {
     private double z;
     private boolean is_detachable;
     private int max_payload;
+    private String registration_number;
     private int trailer_mass;
     @Column(length = 100)
     private String description;

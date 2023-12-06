@@ -70,7 +70,8 @@ public class UserManagementServiceImpl implements UserManagementService {
         if (userUpdateDto.getSurname() != null) {
             user.setSurname(userUpdateDto.getSurname());
         }
-        if (userUpdateDto.getEmail() != null) {
+        if (userUpdateDto.getEmail() != null
+                && userDBService.getUserByEmail(userUpdateDto.getEmail()) == null) {
             user.setEmail(userUpdateDto.getEmail());
         }
         if (userUpdateDto.getPassword() != null) {

@@ -153,6 +153,15 @@ public class CommissionController {
 
 
         Route route = routeDBService.getRoute(Integer.valueOf(addCommissionToRouteDto.getRoute_id()));
+
+        List<Commission> commissions = commissionDBService.getCommissionByRoute(route);
+        for(Commission c : commissions) {
+            if(c.getIs_unloaded() == true || c.getIs_loaded() == true){
+                return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, "Przejazd ruszyl");
+            }
+        }
+
+
         int count = commissionDBService.getCommissionByRoute(route).size();
 
         for(int i = 0 ; i < addCommissionToRouteDto.getPackages().size(); i++){
@@ -223,6 +232,15 @@ public class CommissionController {
         Commission commissionSt = commissionDBService.getCommission(commissionSwapDto.getFirst());
         Commission commissionNd = commissionDBService.getCommission(commissionSwapDto.getSecond());
 
+
+
+        List<Commission> commissions = commissionDBService.getCommissionByRoute(commissionNd.getRoute());
+        for(Commission c : commissions) {
+            if(c.getIs_unloaded() == true || c.getIs_loaded() == true){
+                return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, "Przejazd ruszyl");
+            }
+        }
+
         int i = commissionSt.getPoint_number_start();
         commissionSt.setPoint_number_start(commissionNd.getPoint_number_start());
         commissionNd.setPoint_number_start(i);
@@ -236,8 +254,18 @@ public class CommissionController {
     @PostMapping("/commissionEndPointSwap")
     public ResponseEntity<Object> commissionEndPointSwap(@RequestHeader("Authorization") String authorizationHeader, @RequestBody CommissionSwapDto commissionSwapDto) {
 
+
+
+
         Commission commissionSt = commissionDBService.getCommission(commissionSwapDto.getFirst());
         Commission commissionNd = commissionDBService.getCommission(commissionSwapDto.getSecond());
+
+        List<Commission> commissions = commissionDBService.getCommissionByRoute(commissionNd.getRoute());
+        for(Commission c : commissions) {
+            if(c.getIs_unloaded() == true || c.getIs_loaded() == true){
+                return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, "Przejazd ruszyl");
+            }
+        }
 
         int i = commissionSt.getPoint_number_end();
         commissionSt.setPoint_number_end(commissionNd.getPoint_number_end());

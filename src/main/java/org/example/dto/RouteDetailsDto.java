@@ -15,7 +15,8 @@ import java.util.List;
 public class RouteDetailsDto implements Serializable {
     private static final long serialVersionUID = 5926468583005150707L;
 
-    Address addressStart;
+    String addressStart;
+    String addressEnd;
     Route route;
     List<Commission>commissions;
     List<Commission>commissions2;

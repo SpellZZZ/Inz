@@ -81,6 +81,10 @@ public class VehicleController {
             truck.setModel(truckAddDto.getModel());
             truck.setTruck_mass(truckAddDto.getMass());
             truck.setRegistration_number(truckAddDto.getLicensePlate());
+            truck.setVin(truckAddDto.getVin());
+            truck.setDescription(truckAddDto.getDescription());
+            truck.setBrand(truckAddDto.getBrand());
+
             truckDBService.saveTruck(truck);
 
 
@@ -113,6 +117,8 @@ public class VehicleController {
             trailer.setX(trailerAddDto.getWidth());
             trailer.setY(trailerAddDto.getHeight());
             trailer.setZ(trailerAddDto.getVolume());
+            trailer.setDescription(trailerAddDto.getDescription());
+            trailer.setRegistration_number(trailerAddDto.getLicensePlate());
 
             trailerDBService.saveTrailer(trailer);
 
@@ -132,23 +138,31 @@ public class VehicleController {
 
 
     @PostMapping("/deleteTruck")
-    public ResponseEntity<Object> deleteTruck(@RequestBody TruckDto truckAddDto,
+    public ResponseEntity<Object> deleteTruck(@RequestBody BindDriverTruckTrailerDto bindDriverTruckTrailerDto,
                                                 @RequestHeader("Authorization") String authorizationHeader) {
 
         try {
 
 
             User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
-            Truck truck = new Truck();
 
-            truck.setCompany(user.getCompany());
-            truck.setModel(truckAddDto.getModel());
-            truck.setTruck_mass(truckAddDto.getMass());
-            truck.setRegistration_number(truckAddDto.getLicensePlate());
-            truckDBService.saveTruck(truck);
+            Truck truck = truckDBService.getTruck(bindDriverTruckTrailerDto.getTruck_id());
+
+            List <Route_Truck> routeTrucks = routeTruckDBService.getRouteTruckByTruck(truck);
+            if(routeTrucks.size() > 0 ) return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, "istnieje powiazanie");
 
 
-            return ResponseHelper.createSuccessResponse("Pojazd dodany");
+            List <Truck_Trailer> truckTrailers = truckTrailerDBService.getTruckTrailers();
+
+            for (Truck_Trailer tt : truckTrailers) {
+                if(tt.getTruck() == truck) return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, "istnieje powiazanie");
+
+            }
+
+            truckDBService.deleteTruck(truck.getTruck_id());
+
+
+            return ResponseHelper.createSuccessResponse("Pojazd usuniety");
         } catch (JwtTokenException ex) {
             return ResponseHelper.createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (ObjectAlreadyExistsException ex) {
@@ -162,26 +176,28 @@ public class VehicleController {
 
 
     @PostMapping("/deleteTrailer")
-    public ResponseEntity<Object> deleteTrailer(@RequestBody TrailerDto trailerAddDto,
+    public ResponseEntity<Object> deleteTrailer(@RequestBody BindDriverTruckTrailerDto bindDriverTruckTrailerDto,
                                                  @RequestHeader("Authorization") String authorizationHeader) {
 
         try {
 
             User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
-            Trailer trailer = new Trailer();
 
-            trailer.setCompany(user.getCompany());
-            trailer.set_detachable(trailerAddDto.isDismount());
-            trailer.setTrailer_mass(trailerAddDto.getMass());
-            trailer.setMax_payload(trailerAddDto.getMaxMass());
-            trailer.setX(trailerAddDto.getWidth());
-            trailer.setY(trailerAddDto.getHeight());
-            trailer.setZ(trailerAddDto.getVolume());
-
-            trailerDBService.saveTrailer(trailer);
+            Trailer trailer = trailerDBService.getTrailer(bindDriverTruckTrailerDto.getTrailer_id());
 
 
-            return ResponseHelper.createSuccessResponse("Naczepa dodana");
+
+            List <Truck_Trailer> truckTrailers = truckTrailerDBService.getTruckTrailers();
+
+            for (Truck_Trailer tt : truckTrailers) {
+                if(tt.getTrailer() == trailer) return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, "istnieje powiazanie");
+
+            }
+
+            trailerDBService.deleteTrailer(trailer.getTrailer_id());
+
+
+            return ResponseHelper.createSuccessResponse("Naczepa usunieta");
         } catch (JwtTokenException ex) {
             return ResponseHelper.createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (ObjectAlreadyExistsException ex) {

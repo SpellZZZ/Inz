@@ -18,18 +18,13 @@ public class TrailerDto implements Serializable {
     private  int maxMass;
     private  int mass;
     private  boolean isDismount;
+    private  String licensePlate;
+
+    private  String description;
 
 
     public TrailerDto() {
     }
 
 
-    public TrailerDto(double width, double height, double volume, int maxMass, int mass, boolean isDismount) {
-        this.width = width;
-        this.height = height;
-        this.volume = volume;
-        this.maxMass = maxMass;
-        this.mass = mass;
-        this.isDismount = isDismount;
-    }
 }
