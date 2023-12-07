@@ -10,11 +10,15 @@ import java.io.Serializable;
 public class AuthenticateResponseDto implements Serializable {
 
     private static final long serialVersionUID = -8091879091924046844L;
-    private final String token;
-    private final String role;
-    private final boolean cancaled;
-    public AuthenticateResponseDto(String accessToken, String role, boolean cancaled) {
-        this.token = accessToken;
+    private  String token;
+    private  String role;
+    private  boolean cancaled;
+    public AuthenticateResponseDto() {
+
+    }
+
+    public AuthenticateResponseDto(String token, String role, boolean cancaled) {
+        this.token = token;
         this.role = role;
         this.cancaled = cancaled;
     }

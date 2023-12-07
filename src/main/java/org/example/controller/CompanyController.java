@@ -36,6 +36,8 @@ public class CompanyController {
     private final TruckDBService truckDBService;
     private final TrailerDBService trailerDBService;
 
+    private final RoleDBService roleDBService;
+
     @Autowired
     public CompanyController(UserManagementService userManagementService,
                              UserDBService userDBService,
@@ -45,7 +47,8 @@ public class CompanyController {
                              TruckDBService truckDBService,
                              TrailerDBService trailerDBService,
                              TruckTrailerDBService truckTrailerDBService,
-                             UserTruckDBService userTruckDBService) {
+                             UserTruckDBService userTruckDBService,
+                             RoleDBService roleDBService) {
         this.userManagementService = userManagementService;
         this.userDBService = userDBService;
         this.jwtTokenUtil = jwtTokenUtil;
@@ -55,6 +58,7 @@ public class CompanyController {
         this.userTruckDBService = userTruckDBService;
         this.truckDBService = truckDBService;
         this.trailerDBService = trailerDBService;
+        this.roleDBService = roleDBService;
     }
 
 
@@ -73,6 +77,31 @@ public class CompanyController {
             companyDBService.saveCompany(company);
             companyManagementService.setOwner(company, authorizationHeader);
             return ResponseHelper.createSuccessResponse("Firma stworzona");
+        } catch (JwtTokenException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        } catch (ObjectAlreadyExistsException ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
+        }
+        catch (Exception ex) {
+            return ResponseHelper.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Wystąpił błąd");
+        }
+    }
+    @DeleteMapping("/companyDelete")
+    public ResponseEntity<Object> companyCreate(@RequestHeader("Authorization") String authorizationHeader) {
+
+        try {
+            User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+
+            Company company = user.getCompany();
+
+
+            user.setCompany(null);
+            user.setRole(roleDBService.getRoleByName("Uzytkownik"));
+            companyDBService.deleteCompany(company.getCompany_id());
+            userDBService.userUpdate(user);
+
+
+            return ResponseHelper.createSuccessResponse("Firma usunieta");
         } catch (JwtTokenException ex) {
             return ResponseHelper.createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (ObjectAlreadyExistsException ex) {
@@ -215,6 +244,7 @@ public class CompanyController {
 
         return ResponseEntity.ok(res);
     }
+
 
 
 }

@@ -19,24 +19,19 @@ import java.util.List;
 @Service
 public class CompanyManagementServiceImpl implements CompanyManagementService {
 
-    private final CompanyDBService companyDBService;
-    private final JwtAuthService jwtAuthService;
+
     private final UserManagementService userManagementService;
     private final RoleDBService roleDBService;
     private final UserDBService userDBService;
     private final UserTruckDBService userTruckDBService;
 
     @Autowired
-    public CompanyManagementServiceImpl(CompanyDBService companyDBService,
-                                        JwtAuthService jwtAuthService,
-                                        UserManagementService userManagementService,
+    public CompanyManagementServiceImpl(UserManagementService userManagementService,
                                         RoleDBService roleDBService,
                                         UserDBService userDBService,
-                                        RouteTruckDBService routeTruckDBService,
                                         UserTruckDBService userTruckDBService
     ) {
-        this.companyDBService = companyDBService;
-        this.jwtAuthService = jwtAuthService;
+
         this.userManagementService = userManagementService;
         this.roleDBService = roleDBService;
         this.userDBService = userDBService;

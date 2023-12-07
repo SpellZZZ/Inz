@@ -24,6 +24,7 @@ public class UserManagementServiceImpl implements UserManagementService {
     private final RoleDBService roleDBService;
 
 
+
     @Autowired
     public UserManagementServiceImpl(
 
@@ -37,9 +38,10 @@ public class UserManagementServiceImpl implements UserManagementService {
         this.jwtTokenUtil = jwtTokenUtil;
         this.jwtAuthService = jwtAuthService;
         this.roleDBService = roleDBService;
-
-
     }
+
+
+
 
     @Override
     public User fillFields(RegisterFormDto registerFormDto) {
