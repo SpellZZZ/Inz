@@ -465,7 +465,7 @@ public class RouteController {
     }
 
 
-    private boolean validateDate(String dStart, String dEnd){
+    public static boolean validateDate(String dStart, String dEnd){
 
         Date start = Date.valueOf(dStart);
         Date end = Date.valueOf(dEnd);

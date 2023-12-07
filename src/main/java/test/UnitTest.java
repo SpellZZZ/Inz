@@ -1,5 +1,6 @@
 package test;
 
+import org.example.controller.RouteController;
 import org.example.model.Company;
 import org.example.service.JwtAuthService;
 import org.example.service.dbService.RoleDBService;
@@ -16,7 +17,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.validation.constraints.AssertTrue;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class UnitTest {
@@ -56,6 +60,17 @@ public class UnitTest {
         String actualRole = userManagementService.getUserRole(userName);
 
         assertEquals("Uzytkownik", actualRole);
+    }
+
+    @Test
+    void checkDateTest(){
+        String d1 = "2024-03-11";
+        String d2 = "2024-03-17";
+
+        boolean result = RouteController.validateDate(d1, d2);
+
+        assertTrue(result);
+
     }
 
 

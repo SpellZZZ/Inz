@@ -1,6 +1,6 @@
 package org.example.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +15,7 @@ import java.sql.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "commission_id")
 public class Commission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,20 +43,22 @@ public class Commission {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    @JsonBackReference
+    @JsonIgnore
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "route_id")
-    @JsonBackReference
+    @JsonIgnore
     private Route route;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "address_pickup_id")
+    @JsonIgnore
     private Address delivery_pickup;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "address_endpoint_id")
+    @JsonIgnore
     private Address delivery_endpoint;
 
 
