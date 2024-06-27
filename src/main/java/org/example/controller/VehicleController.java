@@ -7,21 +7,18 @@ import org.example.exceptions.ObjectAlreadyExistsException;
 import org.example.exceptions.UserDoesntExistsException;
 import org.example.model.*;
 import org.example.service.dbService.*;
-import org.example.service.managementService.CompanyManagementService;
 import org.example.service.managementService.UserManagementService;
+import org.example.service.managementService.VehicleManagenemtSevice;
 import org.example.service.managementService.VehicleManagenemtSeviceImpl;
-import org.example.util.JwtTokenUtil;
 import org.example.util.ResponseHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 
 @RestController("/vehicle")
 public class VehicleController {
@@ -34,7 +31,7 @@ public class VehicleController {
     private final TrailerDBService trailerDBService;
     private final TruckTrailerDBService truckTrailerDBService;
     private final UserTruckDBService userTruckDBService;
-    private final VehicleManagenemtSeviceImpl vehicleManagenemtSevice;
+    private final VehicleManagenemtSevice vehicleManagenemtSevice;
 
     @Autowired
     public VehicleController(UserManagementService userManagementService,
@@ -43,7 +40,7 @@ public class VehicleController {
                              TrailerDBService trailerDBService,
                              TruckTrailerDBService truckTrailerDBService,
                              UserTruckDBService userTruckDBService,
-                             VehicleManagenemtSeviceImpl vehicleManagenemtSevice) {
+                             VehicleManagenemtSevice vehicleManagenemtSevice) {
         this.userManagementService = userManagementService;
         this.userDBService = userDBService;
         this.truckDBService = truckDBService;

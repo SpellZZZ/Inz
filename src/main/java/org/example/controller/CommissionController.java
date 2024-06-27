@@ -10,7 +10,7 @@ import org.example.model.Commission;
 import org.example.model.Route;
 import org.example.model.User;
 import org.example.service.dbService.*;
-import org.example.service.managementService.CommissionManagementServiceImpl;
+import org.example.service.managementService.CommissionManagementService;
 import org.example.service.managementService.UserManagementService;
 import org.example.util.ResponseHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +26,13 @@ public class CommissionController {
     private final UserManagementService userManagementService;
     private final CommissionDBService commissionDBService;
     private final RouteDBService routeDBService;
-    private final CommissionManagementServiceImpl commissionManagementService;
+    private final CommissionManagementService commissionManagementService;
 
     @Autowired
     public CommissionController(UserManagementService userManagementService,
                                 CommissionDBService commissionDBService,
                                 RouteDBService routeDBService,
-                                CommissionManagementServiceImpl commissionManagementService) {
+                                CommissionManagementService commissionManagementService) {
         this.userManagementService = userManagementService;
         this.commissionDBService = commissionDBService;
         this.routeDBService = routeDBService;

@@ -7,23 +7,15 @@ import org.example.exceptions.ObjectAlreadyExistsException;
 import org.example.exceptions.UserDoesntExistsException;
 import org.example.model.*;
 import org.example.service.dbService.*;
-import org.example.service.managementService.CompanyManagementService;
 import org.example.service.managementService.RouteManagementService;
-import org.example.service.managementService.RouteManagementServiceImpl;
 import org.example.service.managementService.UserManagementService;
-import org.example.util.JwtTokenUtil;
 import org.example.util.ResponseHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 
 @RestController("/route")
 public class RouteController {
@@ -31,13 +23,13 @@ public class RouteController {
 
     private final UserManagementService userManagementService;
     private final RouteDBService routeDBService;
-    private final RouteManagementServiceImpl routeManagementService;
+    private final RouteManagementService routeManagementService;
 
 
     @Autowired
     public RouteController(UserManagementService userManagementService,
                            RouteDBService routeDBService,
-                           RouteManagementServiceImpl routeManagementService) {
+                           RouteManagementService routeManagementService) {
         this.userManagementService = userManagementService;
         this.routeDBService = routeDBService;
         this.routeManagementService = routeManagementService;
