@@ -9,6 +9,7 @@ import org.example.model.*;
 import org.example.service.dbService.*;
 import org.example.service.managementService.CompanyManagementService;
 import org.example.service.managementService.UserManagementService;
+import org.example.service.managementService.VehicleManagenemtSeviceImpl;
 import org.example.util.JwtTokenUtil;
 import org.example.util.ResponseHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,37 +30,27 @@ public class VehicleController {
 
     private final UserManagementService userManagementService;
     private final UserDBService userDBService;
-    private final JwtTokenUtil jwtTokenUtil;
-    private final CompanyDBService companyDBService;
-    private final CompanyManagementService companyManagementService;
     private final TruckDBService truckDBService;
     private final TrailerDBService trailerDBService;
     private final TruckTrailerDBService truckTrailerDBService;
     private final UserTruckDBService userTruckDBService;
-    private final RouteDBService routeDBService;
-
+    private final VehicleManagenemtSeviceImpl vehicleManagenemtSevice;
 
     @Autowired
     public VehicleController(UserManagementService userManagementService,
                              UserDBService userDBService,
-                             JwtTokenUtil jwtTokenUtil,
-                             CompanyDBService companyDBService,
-                             CompanyManagementService companyManagementService,
                              TruckDBService truckDBService,
                              TrailerDBService trailerDBService,
                              TruckTrailerDBService truckTrailerDBService,
                              UserTruckDBService userTruckDBService,
-                             RouteDBService routeDBService) {
+                             VehicleManagenemtSeviceImpl vehicleManagenemtSevice) {
         this.userManagementService = userManagementService;
         this.userDBService = userDBService;
-        this.jwtTokenUtil = jwtTokenUtil;
-        this.companyDBService = companyDBService;
-        this.companyManagementService = companyManagementService;
         this.truckDBService = truckDBService;
         this.trailerDBService = trailerDBService;
         this.truckTrailerDBService = truckTrailerDBService;
         this.userTruckDBService = userTruckDBService;
-        this.routeDBService = routeDBService;
+        this.vehicleManagenemtSevice =  vehicleManagenemtSevice;
     }
 
 
@@ -71,14 +62,8 @@ public class VehicleController {
 
         try {
 
-
             User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
-            Truck truck = new Truck();
-
-            truck.setCompany(user.getCompany());
-            truck.setModel(truckAddDto.getModel());
-            truck.setTruck_mass(truckAddDto.getMass());
-            truck.setRegistration_number(truckAddDto.getLicensePlate());
+            Truck truck = vehicleManagenemtSevice.createTruck(user, truckAddDto);
             truckDBService.saveTruck(truck);
 
 
@@ -102,18 +87,8 @@ public class VehicleController {
         try {
 
             User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
-            Trailer trailer = new Trailer();
-
-            trailer.setCompany(user.getCompany());
-            trailer.set_detachable(trailerAddDto.isDismount());
-            trailer.setTrailer_mass(trailerAddDto.getMass());
-            trailer.setMax_payload(trailerAddDto.getMaxMass());
-            trailer.setX(trailerAddDto.getWidth());
-            trailer.setY(trailerAddDto.getHeight());
-            trailer.setZ(trailerAddDto.getVolume());
-
+            Trailer trailer = vehicleManagenemtSevice.createTrailer(user, trailerAddDto);
             trailerDBService.saveTrailer(trailer);
-
 
             return ResponseHelper.createSuccessResponse("Naczepa dodana");
         } catch (JwtTokenException ex) {
@@ -129,68 +104,6 @@ public class VehicleController {
     }
 
 
-    @PostMapping("/deleteTruck")
-    public ResponseEntity<Object> deleteTruck(@RequestBody TruckDto truckAddDto,
-                                                @RequestHeader("Authorization") String authorizationHeader) {
-
-        try {
-
-
-            User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
-            Truck truck = new Truck();
-
-            truck.setCompany(user.getCompany());
-            truck.setModel(truckAddDto.getModel());
-            truck.setTruck_mass(truckAddDto.getMass());
-            truck.setRegistration_number(truckAddDto.getLicensePlate());
-            truckDBService.saveTruck(truck);
-
-
-            return ResponseHelper.createSuccessResponse("Pojazd dodany");
-        } catch (JwtTokenException ex) {
-            return ResponseHelper.createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
-        } catch (ObjectAlreadyExistsException ex) {
-            return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
-        }
-        catch (Exception ex) {
-            return ResponseHelper.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Wystąpił błąd");
-        }
-    }
-
-
-
-    @PostMapping("/deleteTrailer")
-    public ResponseEntity<Object> deleteTrailer(@RequestBody TrailerDto trailerAddDto,
-                                                 @RequestHeader("Authorization") String authorizationHeader) {
-
-        try {
-
-            User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
-            Trailer trailer = new Trailer();
-
-            trailer.setCompany(user.getCompany());
-            trailer.set_detachable(trailerAddDto.isDismount());
-            trailer.setTrailer_mass(trailerAddDto.getMass());
-            trailer.setMax_payload(trailerAddDto.getMaxMass());
-            trailer.setX(trailerAddDto.getWidth());
-            trailer.setY(trailerAddDto.getHeight());
-            trailer.setZ(trailerAddDto.getVolume());
-
-            trailerDBService.saveTrailer(trailer);
-
-
-            return ResponseHelper.createSuccessResponse("Naczepa dodana");
-        } catch (JwtTokenException ex) {
-            return ResponseHelper.createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
-        } catch (ObjectAlreadyExistsException ex) {
-            return ResponseHelper.createErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
-        } catch (UserDoesntExistsException ex) {
-            return ResponseHelper.createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
-        }
-        catch (Exception ex) {
-            return ResponseHelper.createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Wystąpił błąd");
-        }
-    }
 
     @GetMapping("/getTrucks")
     public ResponseEntity<List<Truck>> getTrucks(@RequestHeader("Authorization") String authorizationHeader) {
@@ -211,55 +124,25 @@ public class VehicleController {
 
     @PostMapping("/bindDriverTruckTrailer")
     public ResponseEntity<Object> bindDriverTruckTrailer(@RequestHeader("Authorization") String authorizationHeader, @RequestBody BindDriverTruckTrailerDto bindDriverTruckTrailerDto) {
-        //User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
-
-        //List<User> users = userDBService.getUserByCompany(user.getCompany());
-
 
         User user = userDBService.getUser(bindDriverTruckTrailerDto.getUser_id());
         Truck truck = truckDBService.getTruck(bindDriverTruckTrailerDto.getTruck_id());
         Trailer trailer = trailerDBService.getTrailer(bindDriverTruckTrailerDto.getTrailer_id());
 
-        System.out.println(bindDriverTruckTrailerDto.getTruck_id());
-
-        User_Truck userTruck = new User_Truck();
-        userTruck.setTruck(truck);
-        userTruck.setUser(user);
-        userTruckDBService.saveUserTruck(userTruck);
-
-        Truck_Trailer truckTrailer = new Truck_Trailer();
-        truckTrailer.setTrailer(trailer);
-        truckTrailer.setTruck(truck);
-        truckTrailer.setUser_id(user.getUser_id());
-        truckTrailerDBService.saveTruckTrailer(truckTrailer);
+        vehicleManagenemtSevice.bindDriverTruckTrailer(user, truck, trailer);
 
         return ResponseEntity.ok("Połączono");
     }
 
     @PostMapping("/unbindDriverTruckTrailer")
     public ResponseEntity<Object> unbindDriverTruckTrailer(@RequestHeader("Authorization") String authorizationHeader, @RequestBody BindDriverTruckTrailerDto bindDriverTruckTrailerDto) {
-        //User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
-
-        //List<User> users = userDBService.getUserByCompany(user.getCompany());
 
 
-        User_Truck userTruck = userTruckDBService.getUserTrucks().stream()
-                .filter(x->
-                        x.getUser().getUser_id()==bindDriverTruckTrailerDto.getUser_id()
-                && x.getTruck().getTruck_id()== bindDriverTruckTrailerDto.getTruck_id()).findFirst().get();
-
-        Truck_Trailer truckTrailer = truckTrailerDBService.getTruckTrailers().stream()
-                        .filter(x->
-                                x.getTruck().getTruck_id()== bindDriverTruckTrailerDto.getTruck_id()
-                        && x.getTrailer().getTrailer_id() == bindDriverTruckTrailerDto.getTrailer_id()
-                        && x.getUser_id() == userTruck.getUser().getUser_id()).findFirst().get();
-
+        User_Truck userTruck = vehicleManagenemtSevice.getUserTruckRel(bindDriverTruckTrailerDto);
+        Truck_Trailer truckTrailer = vehicleManagenemtSevice.getTruckTrailerRel(bindDriverTruckTrailerDto, userTruck);
 
         userTruckDBService.deleteUserTruck(userTruck.getUser_truck_id());
         truckTrailerDBService.deleteTruckTrailer(truckTrailer.getId());
-
-
-
 
         return ResponseEntity.ok("Rozłączono");
     }
@@ -268,10 +151,7 @@ public class VehicleController {
     public ResponseEntity<List<User>> getDrivers(@RequestHeader("Authorization") String authorizationHeader) {
         User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
 
-        List<User> res = userDBService.getUserByCompany(user.getCompany()).stream().filter(
-                        x -> x.getRole().getRole_name().equals("Kierowca")
-                            && x.getTrucks().isEmpty())
-                .collect(Collectors.toList());;
+        List<User> res = vehicleManagenemtSevice.getUnbindedDrivers(user);
 
         return ResponseEntity.ok(res);
     }
@@ -281,43 +161,7 @@ public class VehicleController {
     public ResponseEntity<List<BindedTrucksDto>> getBindedTrucks(@RequestHeader("Authorization") String authorizationHeader) {
         User user = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
 
-        List<User> users = userDBService.getUserByCompany(user.getCompany()).stream().filter(
-                        x -> x.getRole().getRole_name().equals("Kierowca")
-                                && x.getTrucks().size() > 0)
-                .collect(Collectors.toList());
-
-
-
-        List<BindedTrucksDto> trucks = users
-                .stream().map(x -> {BindedTrucksDto dto = new BindedTrucksDto();
-                    dto.setTruck_id(userTruckDBService.getUserTrucks().stream()
-                            .filter(y->
-                                    y.getUser().getUser_id()==x.getUser_id()).findFirst().get().getTruck().getTruck_id());
-                    dto.setTrailer_id(truckTrailerDBService.getTruckTrailers().stream()
-                            .filter(y ->
-                                    y.getUser_id() == x.getUser_id()).findFirst().get().getTrailer().getTrailer_id());
-
-                    dto.setTruckModel(truckDBService.getTruck(dto.getTruck_id()).getModel());
-                    dto.setTruckReg(truckDBService.getTruck(dto.getTruck_id()).getRegistration_number());
-
-                    dto.setTrailerDesc(trailerDBService.getTrailer(dto.getTrailer_id()).getDescription());
-                    dto.setToString(
-                            dto.getTruckModel() + " " +
-                            dto.getTruckReg() + " " +
-                            dto.getTrailerDesc());
-
-                    return dto;})
-                .toList();
-
-        List<BindedTrucksDto> res = new ArrayList<>();
-
-        Set<String> unique = new HashSet<>();
-
-        for(BindedTrucksDto s : trucks){
-            if(unique.add(s.getToString())){
-                res.add(s);
-            }
-        }
+        List<BindedTrucksDto> res = vehicleManagenemtSevice.getBindedTrucks(user);
 
 
         return ResponseEntity.ok(res);
