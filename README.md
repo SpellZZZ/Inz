@@ -1,6 +1,9 @@
 # Mobile storage system
 
-## Oveview
+## Project
+The project consists of three main components: a mobile application, a web application built with React, and a backend implemented using Spring Boot. My contribution was focused solely on the backend. I was responsible for designing and developing the backend services and APIs to support the functionality of both the mobile and web applications.
+
+## Overview
 The aim of this work is to design, implement, and test a web and mobile application that can serve as support for companies offering transportation services. These applications are intended to assist transportation companies in monitoring their transport operations.
 
 ## Technologies
