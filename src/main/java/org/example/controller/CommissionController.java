@@ -100,11 +100,6 @@ public class CommissionController {
             commissionDBService.saveCommission(commission);
 
 
-            /*System.out.println(commissionDto.getGPS_XStart());
-            System.out.println(commissionDto.getGPS_YStart());
-            System.out.println(commissionDto.getGPS_XEnd());
-            System.out.println(commissionDto.getGPS_YEnd());*/
-
             System.out.println(commissionDto.getXpackage());
             System.out.println(commissionDto.getYpackage());
             System.out.println(commissionDto.getZpackage());
