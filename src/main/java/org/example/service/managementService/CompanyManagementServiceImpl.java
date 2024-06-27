@@ -1,40 +1,45 @@
 package org.example.service.managementService;
 
 
-import org.example.dto.CompanyAddUserDto;
-import org.example.dto.CompanyFormDto;
-import org.example.dto.CompanyUserSetRoleDto;
-import org.example.exceptions.ObjectAlreadyExistsException;
+import org.example.dto.*;
 import org.example.exceptions.UserDoesntExistsException;
-import org.example.model.*;
+import org.example.model.Company;
+import org.example.model.Role;
+import org.example.model.User;
 import org.example.service.JwtAuthService;
 import org.example.service.dbService.*;
-import org.example.util.ResponseHelper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CompanyManagementServiceImpl implements CompanyManagementService {
-
-
     private final UserManagementService userManagementService;
     private final RoleDBService roleDBService;
     private final UserDBService userDBService;
+    private final TruckTrailerDBService truckTrailerDBService;
     private final UserTruckDBService userTruckDBService;
+    private final TruckDBService truckDBService;
+    private final TrailerDBService trailerDBService;
 
     @Autowired
-    public CompanyManagementServiceImpl(UserManagementService userManagementService,
+    public CompanyManagementServiceImpl(
+                                        UserManagementService userManagementService,
                                         RoleDBService roleDBService,
                                         UserDBService userDBService,
-                                        UserTruckDBService userTruckDBService
+                                        UserTruckDBService userTruckDBService,
+                                        TruckDBService truckDBService,
+                                        TrailerDBService trailerDBService,
+                                        TruckTrailerDBService truckTrailerDBService
     ) {
-
         this.userManagementService = userManagementService;
         this.roleDBService = roleDBService;
         this.userDBService = userDBService;
+        this.truckTrailerDBService = truckTrailerDBService;
+        this.truckDBService = truckDBService;
+        this.trailerDBService = trailerDBService;
         this.userTruckDBService = userTruckDBService;
     }
     @Override
@@ -62,75 +67,95 @@ public class CompanyManagementServiceImpl implements CompanyManagementService {
         return company;
     }
 
-    @Override
-    public Company updateFields(CompanyFormDto companyFormDto, String authorizationHeader) {
 
-        User owner = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
-
-        return null;
-    }
 
     @Override
     public void addNewUser(CompanyAddUserDto companyAddUserDto, String authorizationHeader) {
+
         User owner = userManagementService.getUserByAuthorizationHeader(authorizationHeader);
+        System.out.println(owner.getUsername());
         Company company = owner.getCompany();
         User user = userDBService.getUserByUserName(companyAddUserDto.getLogin());
+        System.out.println(user.getUsername());
+        System.out.println(companyAddUserDto.getLogin());
+
         if(user == null) {
             throw new UserDoesntExistsException("Nie ma takiego uzytkownika");
         }
-        if(user.getCompany() != null) {
-            throw new ObjectAlreadyExistsException("Użytkownik należy do innej firmy");
-        }
+
         user.setCompany(company);
         userDBService.userUpdate(user);
     }
 
     @Override
-    public void setUserRole(CompanyUserSetRoleDto companyUserSetRoleDto, String authorizationHeader) throws Exception {
+    public void setUserRole(CompanyUserSetRoleDto companyUserSetRoleDto, String authorizationHeader) {
         User user = userDBService.getUserByUserName(companyUserSetRoleDto.getLogin());
-
-        if(user.getRole().getRole_name().equals("Kierowca")){
-            List<User_Truck> userTrucksList = userTruckDBService.getUserTrucks();
-
-            for(User_Truck x : userTrucksList) {
-                if(x.getUser().getUser_id() == user.getUser_id()){
-                    throw new Exception("Użytkownik ma przypisana ciezarowke");
-                }
-
-            }
-
-
-
-        }
-
         Role role = roleDBService.getRoleByName(companyUserSetRoleDto.getRole());
-
         user.setRole(role);
         userDBService.userUpdate(user);
 
     }
 
     @Override
-    public void delete(CompanyAddUserDto companyAddUserDto, String authorizationHeader) throws Exception{
+    public void delete(CompanyAddUserDto companyAddUserDto, String authorizationHeader) {
         User user = userDBService.getUserByUserName(companyAddUserDto.getLogin());
-
-        if(user.getRole().getRole_name().equals("Kierowca")){
-            List<User_Truck> userTrucksList = userTruckDBService.getUserTrucks();
-
-            for(User_Truck x : userTrucksList) {
-                if(x.getUser().getUser_id() == user.getUser_id()){
-                    throw new Exception("Użytkownik ma przypisana ciezarowke");
-                }
-
-            }
-
-        }
-
-
         Role role = roleDBService.getRoleByName("Uzytkownik");
         user.setRole(role);
         user.setCompany(null);
         userDBService.userUpdate(user);
+    }
+
+    @Override
+    public List<CompanyUsersResponseDto> getCompanyUsers(User user) {
+
+        return userDBService.getUserByCompany(user.getCompany())
+                .stream().map(x -> {CompanyUsersResponseDto dto = new CompanyUsersResponseDto();
+                    dto.setLogin(x.getUsername());
+                    dto.setName(x.getName());
+                    dto.setSurname(x.getSurname());
+                    dto.setRole(x.getRole().getRole_name());
+                    return dto;})
+                .toList();
+    }
+
+    @Override
+    public List<BindedDriversDto> companyGetBindedDrivers(User user) {
+
+        List<User> users = userDBService.getUserByCompany(user.getCompany()).stream().filter(
+                        x -> x.getRole().getRole_name().equals("Kierowca")
+                                && x.getTrucks().size() > 0 )
+                .collect(Collectors.toList());
+
+
+
+
+        return users
+                .stream().map(x -> {BindedDriversDto dto = new BindedDriversDto();
+                    dto.setUser_id(x.getUser_id());
+                    dto.setTruck_id(userTruckDBService.getUserTrucks().stream()
+                            .filter(y->
+                                    y.getUser().getUser_id()==x.getUser_id()).findFirst().get().getTruck().getTruck_id());
+                    dto.setTrailer_id(truckTrailerDBService.getTruckTrailers().stream()
+                            .filter(y ->
+                                    y.getUser_id() == x.getUser_id()).findFirst().get().getTrailer().getTrailer_id());
+
+                    dto.setTruckModel(truckDBService.getTruck(dto.getTruck_id()).getModel());
+                    dto.setTruckReg(truckDBService.getTruck(dto.getTruck_id()).getRegistration_number());
+                    dto.setUserName(x.getName());
+                    dto.setUserSurname(x.getSurname());
+
+                    dto.setTrailerDesc(trailerDBService.getTrailer(dto.getTrailer_id()).getDescription());
+                    dto.setToString(dto.getUserName() + " " +
+                            dto.getUserSurname() + " " +
+                            dto.getTruckModel() + " " +
+                            dto.getTruckReg() + " " +
+                            dto.getTrailerDesc());
+
+
+                    return dto;})
+                .toList();
+
+
     }
 
 
