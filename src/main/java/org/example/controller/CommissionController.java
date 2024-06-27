@@ -10,6 +10,7 @@ import org.example.model.Commission;
 import org.example.model.Route;
 import org.example.model.User;
 import org.example.service.dbService.*;
+import org.example.service.managementService.CommissionManagementServiceImpl;
 import org.example.service.managementService.UserManagementService;
 import org.example.util.ResponseHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Date;
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController("/commission")
@@ -27,63 +26,30 @@ public class CommissionController {
     private final UserManagementService userManagementService;
     private final CommissionDBService commissionDBService;
     private final RouteDBService routeDBService;
-    private final AddressDBService addressDBService;
+    private final CommissionManagementServiceImpl commissionManagementService;
 
     @Autowired
     public CommissionController(UserManagementService userManagementService,
                                 CommissionDBService commissionDBService,
                                 RouteDBService routeDBService,
-                                AddressDBService addressDBService) {
+                                CommissionManagementServiceImpl commissionManagementService) {
         this.userManagementService = userManagementService;
         this.commissionDBService = commissionDBService;
         this.routeDBService = routeDBService;
-        this.addressDBService = addressDBService;
+        this.commissionManagementService = commissionManagementService;
 
     }
 
 
     @PostMapping("/commissionCreate")
-    public ResponseEntity<Object> companyCreate(@RequestBody CommissionDto commissionDto,
+    public ResponseEntity<Object> commissionCreate(@RequestBody CommissionDto commissionDto,
                                                 @RequestHeader("Authorization") String authorizationHeader) {
 
         try {
 
-            Commission commission = new Commission();
-            Address addressStart = new Address();
-            Address addressEnd = new Address();
-
-            addressStart.setAddress(commissionDto.getAddressstart());
-            addressStart.setGPS_X(commissionDto.getGps_xstart());
-            addressStart.setGPS_Y(commissionDto.getGps_ystart());
-            addressStart.setHouse_number(commissionDto.getHouse_numberstart());
-            addressStart.setZip_code(commissionDto.getZip_codestart());
-            addressStart.setCity(commissionDto.getCitystart());
-            addressDBService.saveAddress(addressStart);
-
-            addressEnd.setAddress(commissionDto.getAddressend());
-            addressEnd.setGPS_X(commissionDto.getGps_xend());
-            addressEnd.setGPS_Y(commissionDto.getGps_yend());
-            addressEnd.setHouse_number(commissionDto.getHouse_numberend());
-            addressEnd.setZip_code(commissionDto.getZip_codeend());
-            addressEnd.setCity(commissionDto.getCityend());
-            addressDBService.saveAddress(addressEnd);
-
-            commission.setDelivery_pickup(addressStart);
-            commission.setDelivery_endpoint(addressEnd);
-            commission.setDescription(commissionDto.getDescription());
-            commission.setX(commissionDto.getXpackage());
-            commission.setY(commissionDto.getYpackage());
-            commission.setZ(commissionDto.getZpackage());
-            commission.setMass(commissionDto.getMass());
-            commission.setStackable(commissionDto.getStackable());
-            commission.setCount(commissionDto.getCount());
-
-            commission.setUser(userManagementService.getUserByAuthorizationHeader(authorizationHeader));
-            commission.setDate_of_placement(Date.valueOf(LocalDate.now()));
-            commission.setIs_loaded(false);
-            commission.setIs_unloaded(false);
-
-            commissionDBService.saveCommission(commission);
+            Address addressStart = commissionManagementService.addressStartCreate(commissionDto);
+            Address addressEnd = commissionManagementService.addressEndCreate(commissionDto);
+            commissionManagementService.commissionCreate(commissionDto,addressStart,addressEnd,authorizationHeader);
 
 
             return ResponseHelper.createSuccessResponse("Stworzono zlecenie");
