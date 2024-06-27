@@ -10,9 +10,7 @@ import org.example.model.Commission;
 import org.example.model.Route;
 import org.example.model.User;
 import org.example.service.dbService.*;
-import org.example.service.managementService.CompanyManagementService;
 import org.example.service.managementService.UserManagementService;
-import org.example.util.JwtTokenUtil;
 import org.example.util.ResponseHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,28 +25,16 @@ import java.util.List;
 public class CommissionController {
 
     private final UserManagementService userManagementService;
-    private final UserDBService userDBService;
-    private final JwtTokenUtil jwtTokenUtil;
-    private final CompanyDBService companyDBService;
-    private final CompanyManagementService companyManagementService;
     private final CommissionDBService commissionDBService;
     private final RouteDBService routeDBService;
     private final AddressDBService addressDBService;
 
     @Autowired
     public CommissionController(UserManagementService userManagementService,
-                                UserDBService userDBService,
-                                JwtTokenUtil jwtTokenUtil,
-                                CompanyDBService companyDBService,
-                                CompanyManagementService companyManagementService,
                                 CommissionDBService commissionDBService,
                                 RouteDBService routeDBService,
                                 AddressDBService addressDBService) {
         this.userManagementService = userManagementService;
-        this.userDBService = userDBService;
-        this.jwtTokenUtil = jwtTokenUtil;
-        this.companyDBService = companyDBService;
-        this.companyManagementService = companyManagementService;
         this.commissionDBService = commissionDBService;
         this.routeDBService = routeDBService;
         this.addressDBService = addressDBService;
@@ -100,13 +86,6 @@ public class CommissionController {
             commissionDBService.saveCommission(commission);
 
 
-            System.out.println(commissionDto.getXpackage());
-            System.out.println(commissionDto.getYpackage());
-            System.out.println(commissionDto.getZpackage());
-            System.out.println(commissionDto.getMass());
-
-
-
             return ResponseHelper.createSuccessResponse("Stworzono zlecenie");
         } catch (JwtTokenException ex) {
             return ResponseHelper.createErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
@@ -145,7 +124,7 @@ public class CommissionController {
                                             @RequestBody AddCommissionToRouteDto addCommissionToRouteDto) {
 
 
-        Route route = routeDBService.getRoute(Integer.valueOf(addCommissionToRouteDto.getRoute_id()));
+        Route route = routeDBService.getRoute(Integer.parseInt(addCommissionToRouteDto.getRoute_id()));
 
         for(int i = 0 ; i < addCommissionToRouteDto.getPackages().size(); i++){
             Commission c = commissionDBService.getCommission(addCommissionToRouteDto.getPackages().get(i));
